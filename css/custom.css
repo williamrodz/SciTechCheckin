@@ -1,0 +1,14 @@
+.pageBody{
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	border-color: black;
+}
+
+.guestNameInput{
+	width: 300px;
+}
+
+.checkInButton{
+	left:100px;
+}
