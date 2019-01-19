@@ -12,3 +12,43 @@
 .checkInButton{
 	left:100px;
 }
+
+#guestTable{
+	display: grid;
+}
+
+
+.gridRow{
+ 	display: flex;
+ 	justify-content: space-between;
+}
+
+.indexCell{
+	font-size: 130%;
+	font-weight: normal;
+	font-family: arial;
+	text-align: center;
+	width: var(--cell);
+	height: var(--cell);
+
+	/*Max widths and heights*/
+	max-width: var(--indexCellSize);
+	max-height: var(--indexCellSize);
+
+	/*The following code centers the text horizontally and vertically*/
+	vertical-align: middle;
+	line-height: var(--cell);
+}
+
+
+.gridCell {
+	border: 1px solid grey;
+	width: calc(var(--cell) - 1px);
+	height: calc(var(--cell) - 1px);	
+
+	/*Max widths and heights*/
+	max-width: var(--maxWidthWithBorder);
+	max-height: var(--maxWidthWithBorder);
+}
+
+

@@ -1,5 +1,8 @@
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
+var sampleGuests = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
+]};
+
 var guestsByMemberWithState = {};
 var defaultInitialGuestCount = 0;
 
@@ -87,7 +90,65 @@ function decrementGuestCount(){
 }
 
 
+function createTable(guestsFromSchool){
 
+	var grid = document.createElement("div");
+	grid.setAttribute("id","guestTable");
+
+	//create first row, with alphabet index
+	//var alphabetString ='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	var firstRow = document.createElement('div');
+	firstRow.setAttribute("class","gridRow");
+	var attributes = ['#','LastName','FirstName','School','Committee','Delegation'];
+	var cols = attributes.length;
+	for (var i=0; i<cols; i++){
+		var cell = document.createElement('div');
+		cell.setAttribute("class","gridCell");
+		cell.setAttribute("id","indexCell")
+
+
+		var text = attributes[i];
+		var letterText = document.createTextNode(text)
+		cell.appendChild(letterText);
+		firstRow.appendChild(cell);
+
+	}
+
+	grid.appendChild(firstRow);
+
+	var rows = guestsFromSchool.length
+	//Everything after first row
+
+	for (var i=0; i < rows; i++){
+		var gridRow = document.createElement('div');
+		gridRow.setAttribute("class","gridRow")
+
+		//Add row index first
+		var indexCell = document.createElement('div');
+		indexCell.setAttribute("class","gridCell");		
+		indexCell.setAttribute("id","indexCell");		
+		var index = i+1;
+		var indexText = document.createTextNode(index.toString());
+		indexCell.appendChild(indexText);
+		gridRow.appendChild(indexCell);
+
+		//Add content cells
+		var attributes = ['LastName','FirstName','School','Committee','Delegation'];
+
+		for (var j=0; j<attributes.length; j++){
+			var cellText = guestsFromSchool[i][attributes[j]];
+			var cell = document.createElement('div');
+			cell.innerHTML = cellText;
+
+
+			//var cellID = "cellAtRow"+ i + "Col" + j;
+			cell.setAttribute("id",'indexCell');
+			gridRow.appendChild(cell);
+		}
+		grid.appendChild(gridRow);
+	}
+	document.getElementById("guestList").appendChild(grid);
+};
 function clearGuestList(){
 	document.getElementById("guestList").innerHTML = "";	
 
