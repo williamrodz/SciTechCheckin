@@ -1,7 +1,7 @@
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
 var sampleGuests = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
-]};
+,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'}]};
 
 var guestsByMemberWithState = {};
 var defaultInitialGuestCount = 0;
@@ -99,7 +99,7 @@ function createTable(guestsFromSchool){
 	//var alphabetString ='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	var firstRow = document.createElement('div');
 	firstRow.setAttribute("class","gridRow");
-	var attributes = ['#','LastName','FirstName','School','Committee','Delegation'];
+	var attributes = ['SelectAll','#','LastName','FirstName','School','Committee','Delegation'];
 	var cols = attributes.length;
 	for (var i=0; i<cols; i++){
 		var cell = document.createElement('div');
@@ -123,7 +123,35 @@ function createTable(guestsFromSchool){
 		var gridRow = document.createElement('div');
 		gridRow.setAttribute("class","gridRow")
 
-		//Add row index first
+		//add check in checkbox first
+		var formCheck = document.createElement('div');
+		formCheck.classList.add('form-check');
+
+		// inner elements of form check
+		var input = document.createElement('input');
+		input.classList.add('form-check-input');
+		input.setAttribute('type','checkbox');
+		input.setAttribute('id','exampleCheck1');
+
+
+		var label = document.createElement('label');
+		label.setAttribute('class','form-check-label');
+		label.setAttribute('for','exampleCheck1');
+		label.innerHTML = "Check";
+
+		formCheck.appendChild(input);
+		//formCheck.appendChild(label);
+
+		var indexCell = document.createElement('div');
+		indexCell.setAttribute("class","gridCell");		
+		indexCell.setAttribute("id","indexCell");
+		indexCell.appendChild(formCheck);
+
+		gridRow.appendChild(indexCell);		
+
+
+
+		//Add row index second
 		var indexCell = document.createElement('div');
 		indexCell.setAttribute("class","gridCell");		
 		indexCell.setAttribute("id","indexCell");		
@@ -133,12 +161,22 @@ function createTable(guestsFromSchool){
 		gridRow.appendChild(indexCell);
 
 		//Add content cells
-		var attributes = ['LastName','FirstName','School','Committee','Delegation'];
+		var attributes = ['CheckInStatus','LastName','FirstName','School','Committee','Delegation'];
 
 		for (var j=0; j<attributes.length; j++){
-			var cellText = guestsFromSchool[i][attributes[j]];
-			var cell = document.createElement('div');
-			cell.innerHTML = cellText;
+			var attribute = attributes[j]
+			if (attribute == 'CheckInStatus'){
+				continue;
+
+			} else{
+				var cellText = guestsFromSchool[i][attribute];
+				var cell = document.createElement('div');
+				cell.innerHTML = cellText;				
+
+			}
+
+
+
 
 
 			//var cellID = "cellAtRow"+ i + "Col" + j;
