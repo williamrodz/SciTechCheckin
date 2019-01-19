@@ -1,35 +1,45 @@
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
-var sampleGuests = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
+var sampleSchools = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
 ,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'}]};
 
-var guestsByMemberWithState = {};
+var guestStates = {};
 var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 
 
-function loadMemberListToAutoComplete(memberList){
+function loadSchoolListToAutoComplete(schoolList){
 
-	dataList = document.getElementById("memberList");
+	dataList = document.getElementById("schoolList");
 	console.log(dataList);
-	for (var i=0; i<memberList.length; i++){
+	for (var i=0; i<schoolList.length; i++){
 		console.log("adding");
-		memberString = memberList[i];
+		schoolString = schoolList[i];
 		optionHTML = document.createElement("option");
-		optionHTML.setAttribute("value",memberString);
+		optionHTML.setAttribute("value",schoolString);
 		dataList.appendChild(optionHTML);	
 	}
 
 }
 
-function checkInMembersGuest(member,guestname){
-	console.log("member:",member);
+function checkInGuest(guestHash){
 	console.log("guestname:",guestname);
 
-	membersGuests = guestsByMemberWithState[member];
-	membersGuests[guestname].checkedin = true;
+	guestStates[guestHash] = true;
 	incrementGuestCount();
+}
+
+function createDictionaryHash(dictionary){
+	var keys = Object.keys(dictionary);
+	var hash = '';
+	for (var i =0; i <keys.length; i++){
+		key = keys[i];
+		val = dictionary[key];
+		hash += key + "{" + val +"}";
+	}
+	return hash;
+
 }
 
 function createGuestDataStructure(guestsDict){
@@ -37,29 +47,29 @@ function createGuestDataStructure(guestsDict){
 	var members = Object.keys(guestsDict);
 	for (var i =0; i <members.length; i++){
 		member = members[i];
-		membersGuests = guestsByMember[member];
-		guestsWithStates = {};
+		membersGuests = guestsDict[member];
 		for (var j=0; j <membersGuests.length;j++){
 			guest = membersGuests[j];
-			guestsWithStates[guest] = {"name": guest, "checkedin" : false};
+			guestHash = createDictionaryHash(guest);
+			guestStates[guestHash] = false;
 		}
-		guestsByMemberWithState[member] = guestsWithStates;
 	}
 }
 
 
 window.addEventListener('DOMContentLoaded', function(){
-	createGuestDataStructure(guestsByMember);
-	loadMemberListToAutoComplete(Object.keys(guestsByMember));
+	createGuestDataStructure(sampleSchools);
+	loadSchoolListToAutoComplete(Object.keys(sampleSchools));
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
 
 			var currentMemberInput = document.getElementById("memberNameInput").value;
 			console.log(currentMemberInput);
 
-			if (Object.keys(guestsByMember).includes(currentMemberInput)){
+			if (Object.keys(sampleSchools).includes(currentMemberInput)){
 				console.log("YES");
-				populateGuestsOfMember(currentMemberInput);
+				clearGuestList();
+				createTable(sampleSchools[currentMemberInput])
 			}
 
 
@@ -89,6 +99,26 @@ function decrementGuestCount(){
 	}
 }
 
+function createCheckBox(){
+		//add check in checkbox first
+	var formCheck = document.createElement('div');
+	formCheck.classList.add('form-check');
+
+	// inner elements of form check
+	var input = document.createElement('input');
+	input.classList.add('form-check-input');
+	input.setAttribute('type','checkbox');
+	input.setAttribute('id','exampleCheck1');
+
+
+	var label = document.createElement('label');
+	label.setAttribute('class','form-check-label');
+	label.setAttribute('for','exampleCheck1');
+	label.innerHTML = "Check";
+	formCheck.appendChild(input);
+
+	return formCheck;
+}
 
 function createTable(guestsFromSchool){
 
@@ -107,9 +137,14 @@ function createTable(guestsFromSchool){
 		cell.setAttribute("id","indexCell")
 
 
-		var text = attributes[i];
-		var letterText = document.createTextNode(text)
-		cell.appendChild(letterText);
+		var attribute = attributes[i];
+
+		if (attribute == 'SelectAll'){
+			var child = createCheckBox();
+		} else{
+			var child = document.createTextNode(attribute)
+		}
+		cell.appendChild(child);
 		firstRow.appendChild(cell);
 
 	}
