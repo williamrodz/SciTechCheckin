@@ -2,7 +2,12 @@ var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]
 
 var sampleSchools = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
 ,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
-{'LastName':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}]};
+{'LastName':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
+"TestSchool2":
+[{'LastName':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
+,{'LastName':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
+{'LastName':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
+
 
 var guestStates = {};
 var defaultInitialGuestCount = 0;
@@ -129,6 +134,11 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 	input.setAttribute('type','checkbox');
 	if (extraClass){
 		input.classList.add(extraClass);
+		//persist guest checkin on checkbox toggle
+		if (extraClass == 'guestCheckBox'){
+			var checkInStatus = guestStates[checkboxID];
+			input.checked = checkInStatus;
+		}
 	}	
 	if (checkboxID){
 		input.setAttribute('id',checkboxID);
@@ -150,17 +160,13 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 }
 
 function selectAllCheckBoxes(){
-	console.log("SelectAll");
 	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
-	console.log(currentGuestCheckBoxes.length);
 	var currentSelectAllState = document.getElementById('selectAll').checked;
 
-	console.log('currentGuestCheckBoxes');
-	console.log(currentGuestCheckBoxes.length);
+
 
 	var i =0;
 	while (i <currentGuestCheckBoxes.length){
-		console.log('int i is ',i);
 		var checkBox = currentGuestCheckBoxes[i];
 		checkBox.checked = currentSelectAllState;
 
