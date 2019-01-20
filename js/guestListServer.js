@@ -1,12 +1,12 @@
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
-var sampleSchools = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
-,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
-{'LastName':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
+var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
+,{'Name':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
+{'Name':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
 "TestSchool2":
-[{'LastName':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
-,{'LastName':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
-{'LastName':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
+[{'Name':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
+,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
+{'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
 
 
 var guestStates = {};
@@ -78,6 +78,7 @@ function createGuestDataStructure(guestsDict){
 window.addEventListener('DOMContentLoaded', function(){
 	createGuestDataStructure(sampleSchools);
 	loadSchoolListToAutoComplete(Object.keys(sampleSchools));
+	syncGuestCount();
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
 
@@ -125,6 +126,8 @@ function syncGuestCount(){
 		}
 	}
 	document.getElementById("currentGuestCount").innerHTML = checkedInSoFar;
+	document.getElementById("currentNotArrivedYetCount").innerHTML = notCheckedInSoFar;
+
 	//percent checked in
 	var percentIn = checkedInSoFar/(checkedInSoFar+notCheckedInSoFar)*100;
 	setProgressBarPercent(percentIn);
@@ -210,7 +213,7 @@ function createTable(guestsFromSchool){
 	//var alphabetString ='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	var firstRow = document.createElement('div');
 	firstRow.setAttribute("class","gridRow");
-	var attributes = ['SelectAll','#','LastName','FirstName','School','Committee','Delegation'];
+	var attributes = ['SelectAll','#','Name','School','Committee','Delegation'];
 	var cols = attributes.length;
 	for (var i=0; i<cols; i++){
 		var cell = document.createElement('div');
@@ -268,7 +271,7 @@ function createTable(guestsFromSchool){
 		gridRow.appendChild(indexCell);
 
 		//Add content cells
-		var attributes = ['CheckInStatus','LastName','FirstName','School','Committee','Delegation'];
+		var attributes = ['CheckInStatus','Name','School','Committee','Delegation'];
 
 		for (var j=0; j<attributes.length; j++){
 			var attribute = attributes[j]
