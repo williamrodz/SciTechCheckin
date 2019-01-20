@@ -1,7 +1,8 @@
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
 var sampleSchools = {'TestSchool':[{'LastName':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
-,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'}]};
+,{'LastName':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
+{'LastName':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}]};
 
 var guestStates = {};
 var defaultInitialGuestCount = 0;
@@ -13,7 +14,6 @@ function loadSchoolListToAutoComplete(schoolList){
 
 	dataList = document.getElementById("schoolList");
 	for (var i=0; i<schoolList.length; i++){
-		console.log("adding");
 		schoolString = schoolList[i];
 		optionHTML = document.createElement("option");
 		optionHTML.setAttribute("value",schoolString);
@@ -51,7 +51,6 @@ function createDictionaryHash(dictionary){
 }
 
 function createGuestDataStructure(guestsDict){
-	console.log(guestsDict);
 	var members = Object.keys(guestsDict);
 	for (var i =0; i <members.length; i++){
 		member = members[i];
@@ -72,10 +71,8 @@ window.addEventListener('DOMContentLoaded', function(){
 		function (event){
 
 			var currentMemberInput = document.getElementById("memberNameInput").value;
-			console.log(currentMemberInput);
 
 			if (Object.keys(sampleSchools).includes(currentMemberInput)){
-				console.log("YES");
 				clearGuestList();
 				createTable(sampleSchools[currentMemberInput])
 			}
@@ -120,15 +117,19 @@ function decrementGuestCount(){
 	}
 }
 
-function createCheckBox(checkboxID=null,onChangeFunction=null){
+function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 		//add check in checkbox first
 	var formCheck = document.createElement('div');
 	formCheck.classList.add('form-check');
+
 
 	// inner elements of form check
 	var input = document.createElement('input');
 	input.classList.add('form-check-input');
 	input.setAttribute('type','checkbox');
+	if (extraClass){
+		input.classList.add(extraClass);
+	}	
 	if (checkboxID){
 		input.setAttribute('id',checkboxID);
 	}else{
@@ -136,7 +137,6 @@ function createCheckBox(checkboxID=null,onChangeFunction=null){
 	}
 
 	if (onChangeFunction){
-		console.log(onChangeFunction);
 		input.setAttribute('onchange',onChangeFunction);
 	}
 
@@ -144,10 +144,31 @@ function createCheckBox(checkboxID=null,onChangeFunction=null){
 	var label = document.createElement('label');
 	label.setAttribute('class','form-check-label');
 	label.setAttribute('for','exampleCheck1');
-	label.innerHTML = "Check";
 	formCheck.appendChild(input);
 
 	return formCheck;
+}
+
+function selectAllCheckBoxes(){
+	console.log("SelectAll");
+	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
+	console.log(currentGuestCheckBoxes.length);
+	var currentSelectAllState = document.getElementById('selectAll').checked;
+
+	console.log('currentGuestCheckBoxes');
+	console.log(currentGuestCheckBoxes.length);
+
+	var i =0;
+	while (i <currentGuestCheckBoxes.length){
+		console.log('int i is ',i);
+		var checkBox = currentGuestCheckBoxes[i];
+		checkBox.checked = currentSelectAllState;
+
+		toggleGuestCheckIn(checkBox.id);
+		i++;
+
+	}
+
 }
 
 function createTable(guestsFromSchool){
@@ -169,7 +190,7 @@ function createTable(guestsFromSchool){
 		var attribute = attributes[i];
 
 		if (attribute == 'SelectAll'){
-			var child = createCheckBox();
+			var child = createCheckBox('selectAll','selectAllCheckBoxes()');
 		} else{
 			var child = document.createTextNode(attribute)
 		}
@@ -190,7 +211,7 @@ function createTable(guestsFromSchool){
 		//add check in checkbox first
 
 		var guestHash = createDictionaryHash(guestsFromSchool[i]);
-		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')");
+		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
 
 		var indexCell = document.createElement('div');
 		indexCell.setAttribute("class","gridCell");		
@@ -268,9 +289,7 @@ function populateGuestsOfMember(member){
 			guestNameIndex = buttonIDString.indexOf("#:");
 			memberName = buttonIDString.substring(2,guestNameIndex);
 			guestName = buttonIDString.substring(guestNameIndex+2);
-			console.log("-------out--------");
-			console.log("memberName",memberName);
-			console.log("guestName",guestName);			
+		
 
 			checkInMembersGuest(memberName,guestName);
 			buttonHTML.classList.remove("btn-success");			
