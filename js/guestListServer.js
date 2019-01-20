@@ -40,6 +40,12 @@ function deCheckInGuest(guestHash){
 
 function toggleGuestCheckIn(guestHash){
 	guestStates[guestHash] = !guestStates[guestHash];
+	var rowsClassList = document.getElementById("row:"+guestHash).classList;
+	if (rowsClassList.contains('checkedInRow')){
+		rowsClassList.remove('checkedInRow');
+	} else{
+		rowsClassList.add('checkedInRow');
+	}
 	syncGuestCount();
 }
 
@@ -138,6 +144,7 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 		if (extraClass == 'guestCheckBox'){
 			var checkInStatus = guestStates[checkboxID];
 			input.checked = checkInStatus;
+
 		}
 	}	
 	if (checkboxID){
@@ -163,8 +170,6 @@ function selectAllCheckBoxes(){
 	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
 	var currentSelectAllState = document.getElementById('selectAll').checked;
 
-
-
 	var i =0;
 	while (i <currentGuestCheckBoxes.length){
 		var checkBox = currentGuestCheckBoxes[i];
@@ -176,6 +181,9 @@ function selectAllCheckBoxes(){
 	}
 
 }
+
+
+
 
 function createTable(guestsFromSchool){
 
@@ -211,12 +219,22 @@ function createTable(guestsFromSchool){
 	//Everything after first row
 
 	for (var i=0; i < rows; i++){
-		var gridRow = document.createElement('div');
-		gridRow.setAttribute("class","gridRow")
-
-		//add check in checkbox first
-
 		var guestHash = createDictionaryHash(guestsFromSchool[i]);
+		var checkInStatus = guestStates[guestHash];
+
+		var gridRow = document.createElement('div');
+		gridRow.setAttribute("class","gridRow");
+		gridRow.setAttribute('id','row:'+guestHash);
+
+
+		// sync background color with check in status
+		if (checkInStatus){
+			gridRow.classList.add('checkedInRow');
+		}
+
+
+		//add check in checkbox 
+
 		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
 
 		var indexCell = document.createElement('div');
@@ -224,8 +242,6 @@ function createTable(guestsFromSchool){
 		indexCell.appendChild(checkbox);
 
 		gridRow.appendChild(indexCell);		
-
-
 
 		//Add row index second
 		var indexCell = document.createElement('div');
@@ -249,10 +265,6 @@ function createTable(guestsFromSchool){
 				cell.innerHTML = cellText;				
 
 			}
-
-
-
-
 
 			//var cellID = "cellAtRow"+ i + "Col" + j;
 			gridRow.appendChild(cell);

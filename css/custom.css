@@ -23,7 +23,11 @@
  	justify-content: space-between;
 }
 
-.indexCell{
+.checkedInRow{
+	background-color: #90EE90;
+}
+
+.gridCell{
 	border: 1px solid grey;
 
 	font-size: 130%;
@@ -43,7 +47,7 @@
 }
 
 
-.gridCell {
+.extraGridCell {
 /*	width: calc(var(--cell) - 1px);
 	height: calc(var(--cell) - 1px);	*/
 
