@@ -12,7 +12,6 @@ var currentGuestCount = defaultInitialGuestCount;
 function loadSchoolListToAutoComplete(schoolList){
 
 	dataList = document.getElementById("schoolList");
-	console.log(dataList);
 	for (var i=0; i<schoolList.length; i++){
 		console.log("adding");
 		schoolString = schoolList[i];
@@ -24,10 +23,19 @@ function loadSchoolListToAutoComplete(schoolList){
 }
 
 function checkInGuest(guestHash){
-	console.log("guestname:",guestname);
-
+	console.log('checking in'+guestHash);
 	guestStates[guestHash] = true;
 	incrementGuestCount();
+}
+
+function deCheckInGuest(guestHash){
+	guestStates[guestHash] = false;
+	decrementGuestCount();
+}
+
+function toggleGuestCheckIn(guestHash){
+	guestStates[guestHash] = !guestStates[guestHash];
+	syncGuestCount();
 }
 
 function createDictionaryHash(dictionary){
@@ -86,6 +94,19 @@ window.addEventListener('DOMContentLoaded', function(){
 
 });
 
+function syncGuestCount(){
+	var checkedInSoFar = 0;
+	var guestHashes = Object.keys(guestStates);
+	for (i=0; i < guestHashes.length; i++){
+		if (guestStates[guestHashes[i]]){
+			checkedInSoFar++;
+		}
+	}
+	currentGuestCount = checkedInSoFar
+	document.getElementById("currentGuestCount").innerHTML = currentGuestCount; 
+
+}
+
 
 function incrementGuestCount(){
 	currentGuestCount++;
@@ -99,7 +120,7 @@ function decrementGuestCount(){
 	}
 }
 
-function createCheckBox(checkboxID=null){
+function createCheckBox(checkboxID=null,onChangeFunction=null){
 		//add check in checkbox first
 	var formCheck = document.createElement('div');
 	formCheck.classList.add('form-check');
@@ -112,6 +133,11 @@ function createCheckBox(checkboxID=null){
 		input.setAttribute('id',checkboxID);
 	}else{
 		input.setAttribute('id','noID');
+	}
+
+	if (onChangeFunction){
+		console.log(onChangeFunction);
+		input.setAttribute('onchange',onChangeFunction);
 	}
 
 
@@ -162,26 +188,9 @@ function createTable(guestsFromSchool){
 		gridRow.setAttribute("class","gridRow")
 
 		//add check in checkbox first
-		// var formCheck = document.createElement('div');
-		// formCheck.classList.add('form-check');
 
-		// // inner elements of form check
-		// var input = document.createElement('input');
-		// input.classList.add('form-check-input');
-		// input.setAttribute('type','checkbox');
-		// input.setAttribute('id','exampleCheck1');
-
-
-		// var label = document.createElement('label');
-		// label.setAttribute('class','form-check-label');
-		// label.setAttribute('for','exampleCheck1');
-		// label.innerHTML = "Check";
-		var guestID = createDictionaryHash(guestsFromSchool[i]);
-		console.log(guestsFromSchool[i]);
-		var checkbox = createCheckBox(guestID);
-
-		// gridRow.appendChild(checkbox);
-		//formCheck.appendChild(label);
+		var guestHash = createDictionaryHash(guestsFromSchool[i]);
+		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')");
 
 		var indexCell = document.createElement('div');
 		indexCell.setAttribute("class","gridCell");		
@@ -281,7 +290,6 @@ function populateGuestsOfMember(member){
 
 		}
 		guestHTML.appendChild(buttonHTML);
-		console.log(guestHTML);
 
 		document.getElementById("guestList").appendChild(guestHTML);	
 	}
