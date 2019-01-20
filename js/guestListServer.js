@@ -102,16 +102,32 @@ window.addEventListener('DOMContentLoaded', function(){
 
 });
 
+function setProgressBarPercent(percent){
+	//round the percent first
+	var roundedPercent = Math.round(percent);
+
+
+	document.documentElement.style.setProperty('--progressBarWidth',roundedPercent+'%');
+	var progressBarHTML = document.getElementById('progressBar');
+	progressBarHTML.setAttribute('aria-valuenow',roundedPercent);
+	progressBarHTML.innerHTML = roundedPercent+'%';
+}
+
 function syncGuestCount(){
 	var checkedInSoFar = 0;
+	var notCheckedInSoFar = 0;
 	var guestHashes = Object.keys(guestStates);
 	for (i=0; i < guestHashes.length; i++){
 		if (guestStates[guestHashes[i]]){
 			checkedInSoFar++;
+		} else{
+			notCheckedInSoFar++;
 		}
 	}
-	currentGuestCount = checkedInSoFar
-	document.getElementById("currentGuestCount").innerHTML = currentGuestCount; 
+	document.getElementById("currentGuestCount").innerHTML = checkedInSoFar;
+	//percent checked in
+	var percentIn = checkedInSoFar/(checkedInSoFar+notCheckedInSoFar)*100;
+	setProgressBarPercent(percentIn);
 
 }
 

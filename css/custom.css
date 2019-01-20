@@ -1,3 +1,7 @@
+:root{
+	--progressBarWidth:0%;
+}
+
 .pageBody{
 	padding: 10px;
 	display: flex;
