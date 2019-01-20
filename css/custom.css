@@ -24,6 +24,8 @@
 }
 
 .indexCell{
+	border: 1px solid grey;
+
 	font-size: 130%;
 	font-weight: normal;
 	font-family: arial;
@@ -42,13 +44,12 @@
 
 
 .gridCell {
-	border: 1px solid grey;
-	width: calc(var(--cell) - 1px);
-	height: calc(var(--cell) - 1px);	
+/*	width: calc(var(--cell) - 1px);
+	height: calc(var(--cell) - 1px);	*/
 
 	/*Max widths and heights*/
-	max-width: var(--maxWidthWithBorder);
-	max-height: var(--maxWidthWithBorder);
+/*	max-width: var(--maxWidthWithBorder);
+	max-height: var(--maxWidthWithBorder);*/
 }
 
 

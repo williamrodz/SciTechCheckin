@@ -99,7 +99,7 @@ function decrementGuestCount(){
 	}
 }
 
-function createCheckBox(){
+function createCheckBox(checkboxID=null){
 		//add check in checkbox first
 	var formCheck = document.createElement('div');
 	formCheck.classList.add('form-check');
@@ -108,7 +108,11 @@ function createCheckBox(){
 	var input = document.createElement('input');
 	input.classList.add('form-check-input');
 	input.setAttribute('type','checkbox');
-	input.setAttribute('id','exampleCheck1');
+	if (checkboxID){
+		input.setAttribute('id',checkboxID);
+	}else{
+		input.setAttribute('id','noID');
+	}
 
 
 	var label = document.createElement('label');
@@ -134,7 +138,6 @@ function createTable(guestsFromSchool){
 	for (var i=0; i<cols; i++){
 		var cell = document.createElement('div');
 		cell.setAttribute("class","gridCell");
-		cell.setAttribute("id","indexCell")
 
 
 		var attribute = attributes[i];
@@ -159,28 +162,30 @@ function createTable(guestsFromSchool){
 		gridRow.setAttribute("class","gridRow")
 
 		//add check in checkbox first
-		var formCheck = document.createElement('div');
-		formCheck.classList.add('form-check');
+		// var formCheck = document.createElement('div');
+		// formCheck.classList.add('form-check');
 
-		// inner elements of form check
-		var input = document.createElement('input');
-		input.classList.add('form-check-input');
-		input.setAttribute('type','checkbox');
-		input.setAttribute('id','exampleCheck1');
+		// // inner elements of form check
+		// var input = document.createElement('input');
+		// input.classList.add('form-check-input');
+		// input.setAttribute('type','checkbox');
+		// input.setAttribute('id','exampleCheck1');
 
 
-		var label = document.createElement('label');
-		label.setAttribute('class','form-check-label');
-		label.setAttribute('for','exampleCheck1');
-		label.innerHTML = "Check";
+		// var label = document.createElement('label');
+		// label.setAttribute('class','form-check-label');
+		// label.setAttribute('for','exampleCheck1');
+		// label.innerHTML = "Check";
+		var guestID = createDictionaryHash(guestsFromSchool[i]);
+		console.log(guestsFromSchool[i]);
+		var checkbox = createCheckBox(guestID);
 
-		formCheck.appendChild(input);
+		// gridRow.appendChild(checkbox);
 		//formCheck.appendChild(label);
 
 		var indexCell = document.createElement('div');
 		indexCell.setAttribute("class","gridCell");		
-		indexCell.setAttribute("id","indexCell");
-		indexCell.appendChild(formCheck);
+		indexCell.appendChild(checkbox);
 
 		gridRow.appendChild(indexCell);		
 
@@ -189,7 +194,6 @@ function createTable(guestsFromSchool){
 		//Add row index second
 		var indexCell = document.createElement('div');
 		indexCell.setAttribute("class","gridCell");		
-		indexCell.setAttribute("id","indexCell");		
 		var index = i+1;
 		var indexText = document.createTextNode(index.toString());
 		indexCell.appendChild(indexText);
@@ -215,7 +219,6 @@ function createTable(guestsFromSchool){
 
 
 			//var cellID = "cellAtRow"+ i + "Col" + j;
-			cell.setAttribute("id",'indexCell');
 			gridRow.appendChild(cell);
 		}
 		grid.appendChild(gridRow);
