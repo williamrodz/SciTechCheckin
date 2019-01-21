@@ -8,6 +8,10 @@ var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','S
 ,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
 {'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
 
+var guestsBySchool = {};
+
+
+
 
 var guestStates = {};
 var defaultInitialGuestCount = 0;
@@ -75,18 +79,89 @@ function createGuestDataStructure(guestsDict){
 }
 
 
-window.addEventListener('DOMContentLoaded', function(){
-	createGuestDataStructure(sampleSchools);
-	loadSchoolListToAutoComplete(Object.keys(sampleSchools));
+function processCSVDataRow(row){
+	//attributes = ['Name','School','Committee','Delegation'];
+	var school = row[0]
+	var committe = row[1]
+	var delegation = row[2]	
+	var name = row[3]
+
+	var newGuestDict = {'Name':name,"School":school,'Committee':committe, 'Delegation':delegation};
+
+
+	if (guestsBySchool[school]){
+		guestsBySchool[school].push(newGuestDict);
+	} else{
+		guestsBySchool[school] = [newGuestDict];
+	}
+
+}
+
+function loadData(){
+	createGuestDataStructure(guestsBySchool);
+	loadSchoolListToAutoComplete(Object.keys(guestsBySchool));
 	syncGuestCount();
+
+
+}
+
+
+function UploadCSV() {
+  var csvFileUpload = document.getElementById("csvFileUpload");
+  var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+  if (regex.test(csvFileUpload.value.toLowerCase())) {
+      if (typeof (FileReader) != "undefined") {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+              var table = document.createElement("table");
+              var rows = e.target.result.split("\n");
+              for (var i = 0; i < rows.length; i++) {
+                  var row = table.insertRow(-1);
+                  var cells = rows[i].split(",");
+                  processCSVDataRow(cells);
+                  for (var j = 0; j < cells.length; j++) {
+                      var cell = row.insertCell(-1);
+                      cell.innerHTML = cells[j];
+                  }
+              }
+              // var dvTable = document.getElementById("dvTable");
+              // dvTable.innerHTML = "";
+              // dvTable.appendChild(table);
+	          console.log('Before load');
+	          console.log((guestsBySchool));
+	          console.log('After');
+	          loadData();              
+          }
+
+          reader.readAsText(csvFileUpload.files[0]);
+      } else {
+          alert("This browser does not support HTML5.");
+      }
+  } else {
+      alert("Please upload a valid CSV file.");
+  }
+}
+
+
+window.addEventListener('DOMContentLoaded', function(){
+
+	// d3.csv('../test.csv', function(err, data) {
+	//  console.log(data);
+	// })
+
+
+	// d3.csv("../test.csv").then(function(data) {
+	//   console.log(data); // [{"Hello": "world"}, …]
+	// });
+	loadData();
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
 
 			var currentMemberInput = document.getElementById("memberNameInput").value;
 
-			if (Object.keys(sampleSchools).includes(currentMemberInput)){
+			if (Object.keys(guestsBySchool).includes(currentMemberInput)){
 				clearGuestList();
-				createTable(sampleSchools[currentMemberInput])
+				createTable(guestsBySchool[currentMemberInput])
 			}
 
 
@@ -130,6 +205,9 @@ function syncGuestCount(){
 
 	//percent checked in
 	var percentIn = checkedInSoFar/(checkedInSoFar+notCheckedInSoFar)*100;
+	if (Number.isNaN(percentIn)){
+		percentIn =0;
+	}
 	setProgressBarPercent(percentIn);
 
 }

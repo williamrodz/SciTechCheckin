@@ -13,6 +13,13 @@
 
   <script src="js/guestListServer.js"></script>
   <script src="js/autocomplete.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script type="text/javascript">
+
+  </script>
+
+
+
 
 
 
@@ -27,6 +34,11 @@
     <![endif]-->
   </head>
   <body class="pageBody">
+    <input type="file" id="csvFileUpload" />
+    <input type="button" id="upload" value="UploadCSV" onclick = "UploadCSV()" />
+     
+    <div id="dvTable">
+    </div>
     <h1>MITMUNC Check-In</h1>
     <h2>Checked-in Guests</h2>
     <h2 id="currentGuestCount">0</h2>
