@@ -1,0 +1,23 @@
+{
+  "name": "mitmunc-checkin",
+  "version": "1.0.0",
+  "description": "mitmunc delegate check in app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamrodz/CheckIn.git"
+  },
+  "keywords": [
+    "MITMUNC",
+    "checkin"
+  ],
+  "author": "William A. Rodriguez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/williamrodz/CheckIn/issues"
+  },
+  "homepage": "https://github.com/williamrodz/CheckIn#readme"
+}
