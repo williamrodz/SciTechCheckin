@@ -7,7 +7,33 @@
 	display: flex;
 	flex-direction: column;
 	border-color: black;
+	font-family: garamond;
 }
+
+.checkInMonitor{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: green;
+	color: white;
+}
+
+.guestCountMonitorRow{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.guestCountMonitorCell{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	align-items: center;
+}
+
+
+
 
 .guestNameInput{
 	width: 300px;
@@ -25,6 +51,7 @@
 .gridRow{
  	display: flex;
  	justify-content: space-between;
+ 	width: 100%;
 }
 
 .checkedInRow{
@@ -32,32 +59,29 @@
 }
 
 .gridCell{
+	width: 100%;
 	border: 1px solid grey;
 
-	font-size: 130%;
+	font-size: 18px;
 	font-weight: normal;
 	font-family: arial;
 	text-align: center;
-	width: var(--cell);
+/*	width: var(--cell);
 	height: var(--cell);
-
+*/
 	/*Max widths and heights*/
-	max-width: var(--indexCellSize);
-	max-height: var(--indexCellSize);
+/*	max-width: var(--indexCellSize);
+	max-height: var(--indexCellSize);*/
 
 	/*The following code centers the text horizontally and vertically*/
 	vertical-align: middle;
-	line-height: var(--cell);
+/*	line-height: var(--cell);
+*/}
+
+.checkBoxCell{
+	max-width: 40px;	
 }
 
 
-.extraGridCell {
-/*	width: calc(var(--cell) - 1px);
-	height: calc(var(--cell) - 1px);	*/
-
-	/*Max widths and heights*/
-/*	max-width: var(--maxWidthWithBorder);
-	max-height: var(--maxWidthWithBorder);*/
-}
 
 

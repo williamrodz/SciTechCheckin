@@ -39,13 +39,33 @@
      
     <div id="dvTable">
     </div>
-    <h1>MITMUNC Check-In</h1>
-    <h2>Checked-in Guests</h2>
-    <h2 id="currentGuestCount">0</h2>
-    <h2>Not Arrived Yet</h2>
-    <h2 id="currentNotArrivedYetCount">0</h2>
-    <div class="progress">
-      <div class="progress-bar" id='progressBar' role="progressbar" style="width: var(--progressBarWidth);" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%
+    <div class="checkInMonitor">
+      <div class="guestCountMonitorRow">
+        <div class="guestCountMonitorCell">
+          <h1>MITMUNC Check-In</h1>
+        </div>
+      </div>
+      <div class="guestCountMonitorRow">
+        <div class="guestCountMonitorCell">
+          <h2>Checked-in: </h2>
+        </div>
+        <div class="guestCountMonitorCell">
+          <h2>Unarrived: </h2>
+        </div>
+      </div>
+
+      <div class="guestCountMonitorRow">
+        <div class="guestCountMonitorCell">
+          <h2 id="currentGuestCount">0</h2>
+        </div>
+        <div class="guestCountMonitorCell">
+          <h2 id="currentNotArrivedYetCount">0</h2>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id='progressBar' role="progressbar" style="width: var(--progressBarWidth);" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%
+        </div>
       </div>
     </div>
 
@@ -62,7 +82,7 @@
        <label>School Name</label>
        <datalist id="schoolList">
        </datalist>       
-       <input type="text" class="form-control" id="memberNameInput" placeholder="John Danforth" list="schoolList">
+       <input type="text" class="form-control" id="memberNameInput" placeholder="e.g. Cambridge High School" list="schoolList">
      </div>  
    </form>    
 

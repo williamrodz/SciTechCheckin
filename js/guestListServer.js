@@ -32,19 +32,32 @@ function loadSchoolListToAutoComplete(schoolList){
 }
 
 function checkInGuest(guestHash){
-	console.log('checking in'+guestHash);
-	guestStates[guestHash] = true;
-	incrementGuestCount();
+	if (!guestStates[guestHash]){
+		console.log('checking in'+guestHash);
+		guestStates[guestHash] = true;
+		var rowsClassList = document.getElementById("row:"+guestHash).classList;
+		rowsClassList.add('checkedInRow');
+		syncGuestCount();
+	}
 }
 
 function deCheckInGuest(guestHash){
-	guestStates[guestHash] = false;
-	decrementGuestCount();
+	if (guestStates[guestHash]){
+		console.log('de-checking in'+guestHash);
+		guestStates[guestHash] = false;
+		var rowsClassList = document.getElementById("row:"+guestHash).classList;
+
+		if (rowsClassList.contains('checkedInRow')){
+			rowsClassList.remove('checkedInRow');
+		}
+		syncGuestCount();
+	}
 }
 
 function toggleGuestCheckIn(guestHash){
 	guestStates[guestHash] = !guestStates[guestHash];
 	var rowsClassList = document.getElementById("row:"+guestHash).classList;
+
 	if (rowsClassList.contains('checkedInRow')){
 		rowsClassList.remove('checkedInRow');
 	} else{
@@ -266,14 +279,25 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 function selectAllCheckBoxes(){
 	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
 	var currentSelectAllState = document.getElementById('selectAll').checked;
-
+	console.log(currentSelectAllState);
 	var i =0;
 	while (i <currentGuestCheckBoxes.length){
-		var checkBox = currentGuestCheckBoxes[i];
-		checkBox.checked = currentSelectAllState;
+		// unchecked -> checked
+		if (currentSelectAllState){
+			var checkBox = currentGuestCheckBoxes[i];
+			checkBox.checked = true;
 
-		toggleGuestCheckIn(checkBox.id);
-		i++;
+			checkInGuest(checkBox.id);
+			i++;			
+		} else{
+			var checkBox = currentGuestCheckBoxes[i];
+			checkBox.checked = false;
+
+			deCheckInGuest(checkBox.id);
+			i++;				
+
+		}
+
 
 	}
 
@@ -302,6 +326,7 @@ function createTable(guestsFromSchool){
 
 		if (attribute == 'SelectAll'){
 			var child = createCheckBox('selectAll','selectAllCheckBoxes()');
+			cell.classList.add('checkBoxCell');
 		} else{
 			var child = document.createTextNode(attribute)
 		}
@@ -335,7 +360,8 @@ function createTable(guestsFromSchool){
 		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
 
 		var indexCell = document.createElement('div');
-		indexCell.setAttribute("class","gridCell");		
+		indexCell.setAttribute("class","gridCell");	
+		indexCell.classList.add('checkBoxCell');	
 		indexCell.appendChild(checkbox);
 
 		gridRow.appendChild(indexCell);		
@@ -359,6 +385,7 @@ function createTable(guestsFromSchool){
 			} else{
 				var cellText = guestsFromSchool[i][attribute];
 				var cell = document.createElement('div');
+				cell.setAttribute('class','gridCell');
 				cell.innerHTML = cellText;				
 
 			}
