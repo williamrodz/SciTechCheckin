@@ -17,23 +17,23 @@ db.settings({ timestampsInSnapshots: true });
 
 
 
-var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
+// var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
-var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
-,{'Name':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
-{'Name':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
-"TestSchool2":
-[{'Name':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
-,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
-{'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
+// var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
+// ,{'Name':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
+// {'Name':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
+// "TestSchool2":
+// [{'Name':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
+// ,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
+// {'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
 
-for (var i =0; i < Object.keys(sampleSchools).length; i++){
-	var school = Object.keys(sampleSchools)[i];
-	for (var j =0; j < (sampleSchools[school]).length; j++){
-		student = sampleSchools[school][j];
-		student['CheckInStatus'] = false;
-	}
-}
+// for (var i =0; i < Object.keys(sampleSchools).length; i++){
+// 	var school = Object.keys(sampleSchools)[i];
+// 	for (var j =0; j < (sampleSchools[school]).length; j++){
+// 		student = sampleSchools[school][j];
+// 		student['CheckInStatus'] = false;
+// 	}
+// }
 
 var guestsBySchool = {};
 
@@ -45,6 +45,14 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 
+
+function addSchoolToAutoComplete(school){
+	dataList = document.getElementById("schoolList");
+	optionHTML = document.createElement("option");
+	optionHTML.setAttribute("value",school);
+	dataList.appendChild(optionHTML);		
+
+}
 
 function loadSchoolListToAutoComplete(schoolList){
 
@@ -58,25 +66,36 @@ function loadSchoolListToAutoComplete(schoolList){
 
 }
 
+// Record in local guestStates dictionary and then change CSS if active
 function checkInGuest(guestHash){
 	if (!guestStates[guestHash]){
-		console.log('checking in'+guestHash);
+		console.log('checking in\n'+guestHash);
 		guestStates[guestHash] = true;
-		var rowsClassList = document.getElementById("row:"+guestHash).classList;
-		rowsClassList.add('checkedInRow');
-		syncGuestCount();
+
+		// if its CSS is active
+		if (document.getElementById("row:"+guestHash)){
+			var rowsClassList = document.getElementById("row:"+guestHash).classList;
+			rowsClassList.add('checkedInRow');
+			syncGuestCount();
+		}
+
 	}
 }
 
-function deCheckInGuest(guestHash){
+function checkOutGuest(guestHash){
 	if (guestStates[guestHash]){
-		console.log('de-checking in'+guestHash);
+		console.log('de-checking in\n'+guestHash);
 		guestStates[guestHash] = false;
-		var rowsClassList = document.getElementById("row:"+guestHash).classList;
 
-		if (rowsClassList.contains('checkedInRow')){
-			rowsClassList.remove('checkedInRow');
+		// if CSS active 
+		if (document.getElementById("row:"+guestHash)){
+			var rowsClassList = document.getElementById("row:"+guestHash).classList;
+			if (rowsClassList.contains('checkedInRow')){
+				rowsClassList.remove('checkedInRow');
+			}			
 		}
+
+
 		syncGuestCount();
 	}
 }
@@ -152,6 +171,92 @@ function uploadDataToFirebase(guestDict) {
 
 }
 
+function getListOfStudents(){
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        console.log(doc.id, " => ", doc.data());
+	    });
+	});	
+
+}
+
+
+
+
+function watchGuest(guestHash){
+	db.collection("students").doc(guestHash)
+    .onSnapshot(function(doc) {
+        console.log("Current data: ", doc.data());
+
+        var checkInStatus = doc.data()['checkInStatus'];
+        if (checkInStatus){
+        	checkInGuest(guestHash);
+        } else{
+        	checkOutGuest(guestHash);
+        }
+        
+    });
+}
+
+// all students are in guestsBySchool
+// all states are in guestStates
+
+
+function getCurrentGuestDictsFromFirebase(){
+	var students = [];
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        var guestHash = doc.id;
+	        var guestDict = doc.data();
+	        var checkInStatus = guestDict['checkInStatus'];
+	        var school = guestDict['School'];
+	        //console.log('pushing');
+	        students.push(guestDict);
+	    });
+	return students;
+
+	});
+
+
+}
+
+function syncFromFirebase(){
+
+// Get realtime updates with Cloud Firestore
+// You can listen to a document with the onSnapshot() method. An initial call using the callback you provide creates a document snapshot immediately with the current contents of the single document. Then, each time the contents change, another call updates the document snapshot.
+	
+	// go through db
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        var guestHash = doc.id;
+	        var guestDict = doc.data();
+	        var checkInStatus = guestDict['checkInStatus'];
+	        var school = guestDict['School'];
+
+	        guestStates[guestHash] = checkInStatus;
+
+			if (guestsBySchool[school]){
+				guestsBySchool[school].push(guestDict);
+			} else{
+				guestsBySchool[school] = [guestDict];
+				addSchoolToAutoComplete(school);
+
+			}
+			syncGuestCount();
+
+
+	    });
+
+	});
+
+
+
+}
+
+
 
 function processCSVDataRow(row){
 	//attributes = ['Name','School','Committee','Delegation'];
@@ -176,7 +281,6 @@ function loadData(){
 	createGuestDataStructure(guestsBySchool);
 	loadSchoolListToAutoComplete(Object.keys(guestsBySchool));
 	syncGuestCount();
-
 
 }
 
@@ -220,14 +324,6 @@ function UploadCSV() {
 
 window.addEventListener('DOMContentLoaded', function(){
 
-	// d3.csv('../test.csv', function(err, data) {
-	//  console.log(data);
-	// })
-
-
-	// d3.csv("../test.csv").then(function(data) {
-	//   console.log(data); // [{"Hello": "world"}, …]
-	// });
 	loadData();
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
@@ -236,18 +332,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
 			if (Object.keys(guestsBySchool).includes(currentMemberInput)){
 				clearGuestList();
-				createTable(guestsBySchool[currentMemberInput])
+				createTable(currentMemberInput);
 			}
-
-
-			// if (event != null){
-			// 	keyPressed = event.key;
-			// 	if (keyPressed != null && keyPressed == "Enter"){
-			// 		//extract input
-			// 		var inputMemberName = document.getElementById('memberNameInput').value;
-			// 		populateGuestsOfMember(inputMemberName);
-			// 	}				
-			// }
 
 		});
 
@@ -355,7 +441,7 @@ function selectAllCheckBoxes(){
 			var checkBox = currentGuestCheckBoxes[i];
 			checkBox.checked = false;
 
-			deCheckInGuest(checkBox.id);
+			checkOutGuest(checkBox.id);
 			i++;				
 
 		}
@@ -368,7 +454,7 @@ function selectAllCheckBoxes(){
 
 
 
-function createTable(guestsFromSchool){
+function createTable(targetSchool){
 
 	var grid = document.createElement("div");
 	grid.setAttribute("id","guestTable");
@@ -399,64 +485,88 @@ function createTable(guestsFromSchool){
 
 	grid.appendChild(firstRow);
 
-	var rows = guestsFromSchool.length
 	//Everything after first row
 
-	for (var i=0; i < rows; i++){
-		var guestHash = createDictionaryHash(guestsFromSchool[i]);
-		var checkInStatus = guestStates[guestHash];
-
-		var gridRow = document.createElement('div');
-		gridRow.setAttribute("class","gridRow");
-		gridRow.setAttribute('id','row:'+guestHash);
 
 
-		// sync background color with check in status
-		if (checkInStatus){
-			gridRow.classList.add('checkedInRow');
-		}
+	// DO IT THROUGH FB
 
+	// go through db
+	var indexNumber = 1; 
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        var guestHash = doc.id;
+	        var guestDict = doc.data();
+	        var checkInStatus = guestDict['checkInStatus'];
+	        var school = guestDict['School'];
+	        // do logic
 
-		//add check in checkbox 
+			var gridRow = document.createElement('div');
+			gridRow.setAttribute("class","gridRow");
+			gridRow.setAttribute('id','row:'+guestHash);
 
-		var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
-
-		var indexCell = document.createElement('div');
-		indexCell.setAttribute("class","gridCell");	
-		indexCell.classList.add('checkBoxCell');	
-		indexCell.appendChild(checkbox);
-
-		gridRow.appendChild(indexCell);		
-
-		//Add row index second
-		var indexCell = document.createElement('div');
-		indexCell.setAttribute("class","gridCell");		
-		var index = i+1;
-		var indexText = document.createTextNode(index.toString());
-		indexCell.appendChild(indexText);
-		gridRow.appendChild(indexCell);
-
-		//Add content cells
-		var attributes = ['CheckInStatus','Name','School','Committee','Delegation'];
-
-		for (var j=0; j<attributes.length; j++){
-			var attribute = attributes[j]
-			if (attribute == 'CheckInStatus'){
-				continue;
-
-			} else{
-				var cellText = guestsFromSchool[i][attribute];
-				var cell = document.createElement('div');
-				cell.setAttribute('class','gridCell');
-				cell.innerHTML = cellText;				
-
+			// if row already exists or not target school, don't add
+			if (targetSchool != school || document.getElementById('row:'+guestHash)){
+				return;
 			}
 
-			//var cellID = "cellAtRow"+ i + "Col" + j;
-			gridRow.appendChild(cell);
-		}
-		grid.appendChild(gridRow);
-	}
+
+			// sync background color with check in status
+			if (checkInStatus){
+				gridRow.classList.add('checkedInRow');
+			}
+
+
+			//add check in checkbox 
+
+			var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
+
+			var indexCell = document.createElement('div');
+			indexCell.setAttribute("class","gridCell");	
+			indexCell.classList.add('checkBoxCell');	
+			indexCell.appendChild(checkbox);
+
+			gridRow.appendChild(indexCell);		
+
+			//Add row index second
+			var indexCell = document.createElement('div');
+			indexCell.setAttribute("class","gridCell");		
+			var indexText = document.createTextNode(indexNumber.toString());
+			indexCell.appendChild(indexText);
+			gridRow.appendChild(indexCell);
+			indexNumber++;
+
+			//Add content cells
+			var attributes = ['CheckInStatus','Name','School','Committee','Delegation'];
+
+			for (var j=0; j<attributes.length; j++){
+				var attribute = attributes[j]
+				if (attribute == 'CheckInStatus'){
+					continue;
+
+				} else{
+					var cellText = guestDict[attribute];
+					var cell = document.createElement('div');
+					cell.setAttribute('class','gridCell');
+					cell.innerHTML = cellText;				
+
+				}
+
+				//var cellID = "cellAtRow"+ i + "Col" + j;
+				gridRow.appendChild(cell);
+			}
+			grid.appendChild(gridRow);	        
+
+
+	    });
+
+	});
+
+
+
+
+
 	document.getElementById("guestList").appendChild(grid);
 };
 function clearGuestList(){
@@ -464,88 +574,89 @@ function clearGuestList(){
 
 }
 
-function populateGuestsOfMember(member){
-	clearGuestList();
+// function populateGuestsOfMember(member){
+// 	clearGuestList();
+// 	console.log('here');
 
-	guests = Object.keys(guestsByMemberWithState[member]);
-	for (var i =0; i <guests.length; i++){
-		guestObject = guestsByMemberWithState[member][guests[i]];
-		name = guestObject['name'];
-		checkedin = guestObject['checkedin'];
-
-
-		var guestHTML = document.createElement("a");
-		var guestHTMLClass= "list-group-item list-group-item-action";
-		guestHTML.setAttribute("class",guestHTMLClass);
-		guestHTML.setAttribute("href","#");
-		guestHTML.innerHTML = name;
+// 	guests = Object.keys(guestsByMemberWithState[member]);
+// 	for (var i =0; i <guests.length; i++){
+// 		guestObject = guestsByMemberWithState[member][guests[i]];
+// 		name = guestObject['name'];
+// 		checkedin = guestObject['checkedin'];
 
 
-		var buttonHTML = document.createElement("button");
-		buttonHTML.setAttribute("type","button");
-		buttonHTML.setAttribute("class","btn btn-primary checkInButton");
+// 		var guestHTML = document.createElement("a");
+// 		var guestHTMLClass= "list-group-item list-group-item-action";
+// 		guestHTML.setAttribute("class",guestHTMLClass);
+// 		guestHTML.setAttribute("href","#");
+// 		guestHTML.innerHTML = name;
 
-		buttonHTML.setAttribute("id","@:"+member+"#:"+name);
 
-		buttonHTML.addEventListener("mouseup", function (event){
-			buttonHTML = event.target;
-			buttonIDString = buttonHTML.getAttribute("id");
-			guestNameIndex = buttonIDString.indexOf("#:");
-			memberName = buttonIDString.substring(2,guestNameIndex);
-			guestName = buttonIDString.substring(guestNameIndex+2);
+// 		var buttonHTML = document.createElement("button");
+// 		buttonHTML.setAttribute("type","button");
+// 		buttonHTML.setAttribute("class","btn btn-primary checkInButton");
+
+// 		buttonHTML.setAttribute("id","@:"+member+"#:"+name);
+
+// 		buttonHTML.addEventListener("mouseup", function (event){
+// 			buttonHTML = event.target;
+// 			buttonIDString = buttonHTML.getAttribute("id");
+// 			guestNameIndex = buttonIDString.indexOf("#:");
+// 			memberName = buttonIDString.substring(2,guestNameIndex);
+// 			guestName = buttonIDString.substring(guestNameIndex+2);
 		
 
-			checkInMembersGuest(memberName,guestName);
-			buttonHTML.classList.remove("btn-success");			
-			buttonHTML.classList.add("disabled");
-			buttonHTML.innerHTML = "Checked-in";
+// 			checkInMembersGuest(memberName,guestName);
+// 			buttonHTML.classList.remove("btn-success");			
+// 			buttonHTML.classList.add("disabled");
+// 			buttonHTML.innerHTML = "Checked-in";
 
-		});
+// 		});
 
-		if (!checkedin){
-			buttonHTML.classList.add("btn-success");
-			buttonHTML.innerHTML = "Check-in";
+// 		if (!checkedin){
+// 			buttonHTML.classList.add("btn-success");
+// 			buttonHTML.innerHTML = "Check-in";
 
-		}
-		else{
-			buttonHTML.classList.add("disabled");
-			buttonHTML.innerHTML = "Checked-in"
+// 		}
+// 		else{
+// 			buttonHTML.classList.add("disabled");
+// 			buttonHTML.innerHTML = "Checked-in"
 
-		}
-		guestHTML.appendChild(buttonHTML);
+// 		}
+// 		guestHTML.appendChild(buttonHTML);
 
-		document.getElementById("guestList").appendChild(guestHTML);	
-	}
+// 		document.getElementById("guestList").appendChild(guestHTML);	
+// 	}
 
-}
-
-
-
-function populateGuestList(){
-	var guestHTML = document.createElement("a");
-	var guestHTMLClass= "list-group-item list-group-item-action";
-	guestHTML.setAttribute("class",guestHTMLClass);
-	guestHTML.setAttribute("href","#");
-	guestHTML.innerHTML = "Jenny Jin";
+// }
 
 
-	var buttonHTML = document.createElement("button");
-	buttonHTML.setAttribute("type","button");
-	buttonHTML.setAttribute("class","btn btn-primary");
-	buttonHTML.innerHTML = "Check-in";
-	buttonHTML.addEventListener("mouseup", function(event){
-		buttonHTML.classList.remove("btn-primary");
-		buttonHTML.innerHTML = "Checked In";
-		buttonHTML.classList.add("btn-success");
-		buttonHTML.classList.add("disabled");
 
-	},false);
-
-	guestHTML.appendChild(buttonHTML);
+// function populateGuestList(){
+// 	var guestHTML = document.createElement("a");
+// 	var guestHTMLClass= "list-group-item list-group-item-action";
+// 	guestHTML.setAttribute("class",guestHTMLClass);
+// 	guestHTML.setAttribute("href","#");
+// 	guestHTML.innerHTML = "Jenny Jin";
 
 
-	document.getElementById("guestList").appendChild(guestHTML);	
+// 	var buttonHTML = document.createElement("button");
+// 	buttonHTML.setAttribute("type","button");
+// 	buttonHTML.setAttribute("class","btn btn-primary");
+// 	buttonHTML.innerHTML = "Check-in";
+// 	buttonHTML.addEventListener("mouseup", function(event){
+// 		buttonHTML.classList.remove("btn-primary");
+// 		buttonHTML.innerHTML = "Checked In";
+// 		buttonHTML.classList.add("btn-success");
+// 		buttonHTML.classList.add("disabled");
 
-}
+// 	},false);
+
+// 	guestHTML.appendChild(buttonHTML);
+
+
+// 	document.getElementById("guestList").appendChild(guestHTML);	
+
+// }
 
 
