@@ -1,3 +1,18 @@
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyCuE1uw1toQDhgR0ccvV6QFBpm-1HwFYqM",
+  authDomain: "mitmunc-checkin.firebaseapp.com",
+  databaseURL: "https://mitmunc-checkin.firebaseio.com",
+  projectId: "mitmunc-checkin",
+  storageBucket: "mitmunc-checkin.appspot.com",
+  messagingSenderId: "355923752781"
+};
+firebase.initializeApp(config);
+
+
+
+const db = firebase.firestore();
+db.settings({ timestampsInSnapshots: true });
 
 
 
@@ -17,7 +32,6 @@ for (var i =0; i < Object.keys(sampleSchools).length; i++){
 	for (var j =0; j < (sampleSchools[school]).length; j++){
 		student = sampleSchools[school][j];
 		student['CheckInStatus'] = false;
-		console.log(student);
 	}
 }
 
@@ -80,16 +94,23 @@ function toggleGuestCheckIn(guestHash){
 }
 
 function createDictionaryHash(dictionary){
-	var keys = Object.keys(dictionary);
-	var hash = '';
-	for (var i =0; i <keys.length; i++){
-		key = keys[i];
-		val = dictionary[key];
-		hash += key + "{" + val +"}";
-	}
-	return hash;
+	// var keys = Object.keys(dictionary);
+	// var hash = '';
+	// for (var i =0; i <keys.length; i++){
+	// 	key = keys[i];
+	// 	val = dictionary[key];
+	// 	hash += key + "{" + val +"}";
+	// }
+
+
+	dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
+	return dictionaryHash;
 
 }
+
+
+
+
 
 function createGuestDataStructure(guestsDict){
 	var members = Object.keys(guestsDict);
@@ -104,25 +125,44 @@ function createGuestDataStructure(guestsDict){
 	}
 }
 
-function writeUserData(school, studentName, committee, delegation,checkInStatus) {
-  firebase.database().ref('schools/').set({
-    'studentName': studentName,
-    'committee': committee,
-    'delegation' : delegation,
-    'checkInStatus':checkInStatus
-  });
+function uploadDataToFirebase(guestDict) {
+  // firebase.database().ref('schools/'+school).set({
+  //   'studentName': studentName,
+  //   'committee': committee,
+  //   'delegation' : delegation,
+  //   'checkInStatus':checkInStatus
+  // });
+  	var guestHash = createDictionaryHash(guestDict);
+
+
+	db.collection("students").doc(guestHash).set({
+	    'Name': guestDict['Name'],
+	    'School': guestDict['School'],
+	    'Committee': guestDict['Committee'],
+	    'Delegation' : guestDict['Delegation'],
+	    'checkInStatus':guestDict['checkInStatus']
+	        })
+		.then(function() {
+		    console.log("Document successfully written!");
+		})
+		.catch(function(error) {
+		    console.error("Error writing document: ", error);
+		});
+
+
 }
 
 
 function processCSVDataRow(row){
 	//attributes = ['Name','School','Committee','Delegation'];
 	var school = row[0]
-	var committe = row[1]
+	var committee = row[1]
 	var delegation = row[2]	
 	var name = row[3]
 
-	var newGuestDict = {'Name':name,"School":school,'Committee':committe, 'Delegation':delegation, 'checkInStatus':false};
+	var newGuestDict = {'Name':name,"School":school,'Committee':committee, 'Delegation':delegation, 'checkInStatus':false};
 
+	uploadDataToFirebase(newGuestDict);
 
 	if (guestsBySchool[school]){
 		guestsBySchool[school].push(newGuestDict);
