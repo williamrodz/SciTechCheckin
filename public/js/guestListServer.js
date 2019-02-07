@@ -1,3 +1,7 @@
+
+
+
+
 var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
 
 var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
@@ -7,6 +11,15 @@ var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','S
 [{'Name':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
 ,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
 {'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
+
+for (var i =0; i < Object.keys(sampleSchools).length; i++){
+	var school = Object.keys(sampleSchools)[i];
+	for (var j =0; j < (sampleSchools[school]).length; j++){
+		student = sampleSchools[school][j];
+		student['CheckInStatus'] = false;
+		console.log(student);
+	}
+}
 
 var guestsBySchool = {};
 
@@ -91,6 +104,15 @@ function createGuestDataStructure(guestsDict){
 	}
 }
 
+function writeUserData(school, studentName, committee, delegation,checkInStatus) {
+  firebase.database().ref('schools/').set({
+    'studentName': studentName,
+    'committee': committee,
+    'delegation' : delegation,
+    'checkInStatus':checkInStatus
+  });
+}
+
 
 function processCSVDataRow(row){
 	//attributes = ['Name','School','Committee','Delegation'];
@@ -99,7 +121,7 @@ function processCSVDataRow(row){
 	var delegation = row[2]	
 	var name = row[3]
 
-	var newGuestDict = {'Name':name,"School":school,'Committee':committe, 'Delegation':delegation};
+	var newGuestDict = {'Name':name,"School":school,'Committee':committe, 'Delegation':delegation, 'checkInStatus':false};
 
 
 	if (guestsBySchool[school]){

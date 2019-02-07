@@ -26,8 +26,6 @@
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-functions.js"></script>
-
-  
   <script>
     // Initialize Firebase
     var config = {
@@ -39,7 +37,8 @@
       messagingSenderId: "355923752781"
     };
     firebase.initializeApp(config);
-  </script>
+    console.log('HTML')
+  </script>  
 
 
 
@@ -74,7 +73,7 @@
           <h2>Checked-in: </h2>
         </div>
         <div class="guestCountMonitorCell">
-          <h2>Unarrived: </h2>
+          <h2>Yet to Arrive: </h2>
         </div>
       </div>
 
@@ -103,22 +102,14 @@
 
     <form>
      <div class="form-group guestNameInput">
-       <label>School Name</label>
+       <label class='schoolNameLabel'>School Name</label>
        <datalist id="schoolList">
        </datalist>       
        <input type="text" class="form-control" id="memberNameInput" placeholder="e.g. Cambridge High School" list="schoolList">
      </div>  
    </form>    
 
-
-<!--    <form>
-     <div class="form-group guestNameInput">
-       <label for="exampleInputEmail1">Name of Guest</label>
-       <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Nay nay">
-       <small id="emailHelp" class="form-text text-muted">Only registered guests appear hear</small>
-     </div>  
-   </form> -->
-   <h2>School's Students</h2>
+   <label class='schoolStudentsLabel'>School's Students</label>
    <div class="list-group" id="guestList">
    </div>
 

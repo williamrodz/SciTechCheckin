@@ -2,6 +2,10 @@
 	--progressBarWidth:0%;
 }
 
+.progress{
+	width: 75%;
+}
+
 .pageBody{
 	padding: 10px;
 	display: flex;
@@ -14,7 +18,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background-color: green;
+	background-color: #C41E3A;
 	color: white;
 }
 
@@ -39,8 +43,11 @@
 	width: 300px;
 }
 
-.checkInButton{
-	left:100px;
+.schoolNameLabel{
+	font-size: 30px;
+}
+.schoolStudentsLabel{
+	font-size: 30px;
 }
 
 #guestTable{
