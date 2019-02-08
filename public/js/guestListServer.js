@@ -66,38 +66,73 @@ function loadSchoolListToAutoComplete(schoolList){
 
 }
 
+function getDBStateOfGuest(guestHash){
+	firebase.database().ref('/students/' + guestHash).once('value').then(function(snapshot) {
+  	var data = (snapshot.val() && snapshot.val().checkInStatus) || 'Anonymous';
+  	return data;
+	});
+}
+
 // Record in local guestStates dictionary and then change CSS if active
 function checkInGuest(guestHash){
-	if (!guestStates[guestHash]){
-		console.log('checking in\n'+guestHash);
-		guestStates[guestHash] = true;
+	console.log('went in ');
+	// persist to Firebase
+	db.collection("students").doc(guestHash).update({
+	    'checkInStatus':true
+	        })
+		.then(function() {
+		    console.log("Checked in guest on FB");
+			guestStates[guestHash] = true;
 
-		// if its CSS is active
-		if (document.getElementById("row:"+guestHash)){
-			var rowsClassList = document.getElementById("row:"+guestHash).classList;
-			rowsClassList.add('checkedInRow');
+			// if its CSS is active
+			if (document.getElementById("row:"+guestHash)){
+				var rowsClassList = document.getElementById("row:"+guestHash).classList;
+				rowsClassList.add('checkedInRow');
+			}			    
 			syncGuestCount();
-		}
+		})
+		.catch(function(error) {
+		    console.error("Error checking in guest on FB: ", error);
+		});		
 
-	}
 }
 
 function checkOutGuest(guestHash){
-	if (guestStates[guestHash]){
-		console.log('de-checking in\n'+guestHash);
-		guestStates[guestHash] = false;
 
-		// if CSS active 
-		if (document.getElementById("row:"+guestHash)){
-			var rowsClassList = document.getElementById("row:"+guestHash).classList;
-			if (rowsClassList.contains('checkedInRow')){
-				rowsClassList.remove('checkedInRow');
-			}			
-		}
+	// persist to Firebase
+	db.collection("students").doc(guestHash).update({
+	    'checkInStatus':false
+	        })
+		.then(function() {
+		    console.log("Checked out guest on FB");
+			guestStates[guestHash] = false;
+
+			// if CSS active
+			if (document.getElementById("row:"+guestHash)){
+				var rowsClassList = document.getElementById("row:"+guestHash).classList;
+				if (rowsClassList.contains('checkedInRow')){
+					rowsClassList.remove('checkedInRow');
+				}			
+			}
+			syncGuestCount();
+		})
+		.catch(function(error) {
+		    console.error("Error checking in guest on FB: ", error);
+		});	
 
 
-		syncGuestCount();
-	}
+}
+
+function checkOutAllGuests(){
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        var guestHash = doc.id;
+	        //console.log('pushing');
+	        checkOutGuest(guestHash);
+	    });	
+
+	});
 }
 
 function toggleGuestCheckIn(guestHash){
@@ -105,22 +140,14 @@ function toggleGuestCheckIn(guestHash){
 	var rowsClassList = document.getElementById("row:"+guestHash).classList;
 
 	if (rowsClassList.contains('checkedInRow')){
-		rowsClassList.remove('checkedInRow');
+		checkOutGuest(guestHash);
 	} else{
-		rowsClassList.add('checkedInRow');
+		console.log("should check in guest");
+		checkInGuest(guestHash);
 	}
-	syncGuestCount();
 }
 
 function createDictionaryHash(dictionary){
-	// var keys = Object.keys(dictionary);
-	// var hash = '';
-	// for (var i =0; i <keys.length; i++){
-	// 	key = keys[i];
-	// 	val = dictionary[key];
-	// 	hash += key + "{" + val +"}";
-	// }
-
 
 	dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
 	return dictionaryHash;
@@ -145,14 +172,7 @@ function createGuestDataStructure(guestsDict){
 }
 
 function uploadDataToFirebase(guestDict) {
-  // firebase.database().ref('schools/'+school).set({
-  //   'studentName': studentName,
-  //   'committee': committee,
-  //   'delegation' : delegation,
-  //   'checkInStatus':checkInStatus
-  // });
   	var guestHash = createDictionaryHash(guestDict);
-
 
 	db.collection("students").doc(guestHash).set({
 	    'Name': guestDict['Name'],
@@ -187,8 +207,7 @@ function getListOfStudents(){
 function watchGuest(guestHash){
 	db.collection("students").doc(guestHash)
     .onSnapshot(function(doc) {
-        console.log("Current data: ", doc.data());
-
+        // console.log("Current data: ", doc.data());
         var checkInStatus = doc.data()['checkInStatus'];
         if (checkInStatus){
         	checkInGuest(guestHash);
@@ -324,7 +343,8 @@ function UploadCSV() {
 
 window.addEventListener('DOMContentLoaded', function(){
 
-	loadData();
+	//loadData();
+	syncFromFirebase();
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
 
