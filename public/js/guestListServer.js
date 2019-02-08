@@ -205,17 +205,30 @@ function getListOfStudents(){
 
 
 function watchGuest(guestHash){
-	db.collection("students").doc(guestHash)
-    .onSnapshot(function(doc) {
-        // console.log("Current data: ", doc.data());
-        var checkInStatus = doc.data()['checkInStatus'];
-        if (checkInStatus){
-        	checkInGuest(guestHash);
-        } else{
-        	checkOutGuest(guestHash);
-        }
+	var checkInstatusRef = db.ref('students/'+guestHash+'/checkInStatus');
+
+
+	checkInstatusRef.on('value', function(snapshot) {
+	 	//updateStarCount(postElement, snapshot.val());
+	 	console.log(snapshot.val());
+		var checkInStatus = doc.data()['checkInStatus'];
+		if (checkInStatus){
+			checkInGuest(guestHash);
+		} else{
+			checkOutGuest(guestHash);
+		}	  
+	});	
+
+    // .onSnapshot(function(doc) {
+    //     // console.log("Current data: ", doc.data());
+    //     var checkInStatus = doc.data()['checkInStatus'];
+    //     if (checkInStatus){
+    //     	checkInGuest(guestHash);
+    //     } else{
+    //     	checkOutGuest(guestHash);
+    //     }
         
-    });
+    // });
 }
 
 // all students are in guestsBySchool
@@ -270,6 +283,7 @@ function syncFromFirebase(){
 	    });
 
 	});
+
 
 
 
@@ -526,6 +540,10 @@ function createTable(targetSchool){
 			gridRow.setAttribute("class","gridRow");
 			gridRow.setAttribute('id','row:'+guestHash);
 
+
+			// sync with other open browsers with same school
+			//watchGuest(guestHash);
+
 			// if row already exists or not target school, don't add
 			if (targetSchool != school || document.getElementById('row:'+guestHash)){
 				return;
@@ -536,6 +554,10 @@ function createTable(targetSchool){
 			if (checkInStatus){
 				gridRow.classList.add('checkedInRow');
 			}
+
+			gridRow.addEventListener("click", function (event){
+				console.log(guestHash);
+			});
 
 
 			//add check in checkbox 
@@ -573,7 +595,6 @@ function createTable(targetSchool){
 
 				}
 
-				//var cellID = "cellAtRow"+ i + "Col" + j;
 				gridRow.appendChild(cell);
 			}
 			grid.appendChild(gridRow);	        

@@ -2,6 +2,14 @@
 	--progressBarWidth:0%;
 }
 
+.navbar{
+/*	font-family: Helvetica;
+*/	border-radius: 10px;
+	color: white;
+
+
+}
+
 .progress{
 	width: 75%;
 }
