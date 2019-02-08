@@ -35,6 +35,9 @@ db.settings({ timestampsInSnapshots: true });
 // 	}
 // }
 
+
+
+
 var guestsBySchool = {};
 
 
@@ -45,6 +48,15 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 
+
+function toggleHideHTMLElement(domID){
+	var classList = document.getElementById(domID).classList;
+	if (classList.contains('hiddenItem')){
+		classList.remove('hiddenItem');
+	} else{
+		classList.add('hiddenItem');
+	}
+}
 
 function addSchoolToAutoComplete(school){
 	dataList = document.getElementById("schoolList");
@@ -336,9 +348,6 @@ function UploadCSV() {
                       cell.innerHTML = cells[j];
                   }
               }
-              // var dvTable = document.getElementById("dvTable");
-              // dvTable.innerHTML = "";
-              // dvTable.appendChild(table);
 	          console.log('Before load');
 	          console.log((guestsBySchool));
 	          console.log('After');
