@@ -48,7 +48,7 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 
-
+// Takes any html element ID and add the hidden CSS class
 function toggleHideHTMLElement(domID){
 	var classList = document.getElementById(domID).classList;
 	if (classList.contains('hiddenItem')){
@@ -58,6 +58,7 @@ function toggleHideHTMLElement(domID){
 	}
 }
 
+// Adds a school to the dropdown as an option HTML item
 function addSchoolToAutoComplete(school){
 	dataList = document.getElementById("schoolList");
 	optionHTML = document.createElement("option");
@@ -66,6 +67,7 @@ function addSchoolToAutoComplete(school){
 
 }
 
+// Loads all schools to school list
 function loadSchoolListToAutoComplete(schoolList){
 
 	dataList = document.getElementById("schoolList");
@@ -78,12 +80,6 @@ function loadSchoolListToAutoComplete(schoolList){
 
 }
 
-function getDBStateOfGuest(guestHash){
-	firebase.database().ref('/students/' + guestHash).once('value').then(function(snapshot) {
-  	var data = (snapshot.val() && snapshot.val().checkInStatus) || 'Anonymous';
-  	return data;
-	});
-}
 
 // Record in local guestStates dictionary and then change CSS if active
 function checkInGuest(guestHash){
@@ -109,6 +105,7 @@ function checkInGuest(guestHash){
 
 }
 
+// Check out guest to firebase and then apply CSS logic
 function checkOutGuest(guestHash){
 
 	// persist to Firebase
@@ -135,6 +132,9 @@ function checkOutGuest(guestHash){
 
 }
 
+// Checks out ALL guests on the database. 
+// CAREFUL!: No way to recover check in status
+// To do: add 'Are you sure option?' when this is called
 function checkOutAllGuests(){
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
@@ -147,6 +147,7 @@ function checkOutAllGuests(){
 	});
 }
 
+// Toggles check in status for use in check boxes 
 function toggleGuestCheckIn(guestHash){
 	guestStates[guestHash] = !guestStates[guestHash];
 	var rowsClassList = document.getElementById("row:"+guestHash).classList;
@@ -159,6 +160,8 @@ function toggleGuestCheckIn(guestHash){
 	}
 }
 
+
+// Creates hash to be used for database and ID in HTML row for a particular guest
 function createDictionaryHash(dictionary){
 
 	dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
@@ -166,10 +169,8 @@ function createDictionaryHash(dictionary){
 
 }
 
-
-
-
-
+// Populates the 'guestStates' dictionary from an input guest dictionary, 
+// setting everyone to checked-in false in the beginning
 function createGuestDataStructure(guestsDict){
 	var members = Object.keys(guestsDict);
 	for (var i =0; i <members.length; i++){
@@ -183,6 +184,8 @@ function createGuestDataStructure(guestsDict){
 	}
 }
 
+
+// Upload a singular guest to the Firebase databse from its guest dictionary
 function uploadDataToFirebase(guestDict) {
   	var guestHash = createDictionaryHash(guestDict);
 
@@ -200,9 +203,10 @@ function uploadDataToFirebase(guestDict) {
 		    console.error("Error writing document: ", error);
 		});
 
-
 }
 
+// For debugging purposes
+// Logs the list of students with their data in the console
 function getListOfStudents(){
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
@@ -214,8 +218,8 @@ function getListOfStudents(){
 }
 
 
-
-
+// Careful! Exhausts Firebase queries in less than three minutes
+// Was an attempt to keep guest check in status synced between two simultaneous sessions 
 function watchGuest(guestHash){
 	var checkInstatusRef = db.ref('students/'+guestHash+'/checkInStatus');
 
@@ -230,23 +234,9 @@ function watchGuest(guestHash){
 			checkOutGuest(guestHash);
 		}	  
 	});	
-
-    // .onSnapshot(function(doc) {
-    //     // console.log("Current data: ", doc.data());
-    //     var checkInStatus = doc.data()['checkInStatus'];
-    //     if (checkInStatus){
-    //     	checkInGuest(guestHash);
-    //     } else{
-    //     	checkOutGuest(guestHash);
-    //     }
-        
-    // });
 }
 
-// all students are in guestsBySchool
-// all states are in guestStates
-
-
+// For debugging purposes
 function getCurrentGuestDictsFromFirebase(){
 	var students = [];
 	db.collection("students").get().then(function(querySnapshot) {
@@ -266,6 +256,7 @@ function getCurrentGuestDictsFromFirebase(){
 
 }
 
+// Sync guestStates from firebase database
 function syncFromFirebase(){
 
 // Get realtime updates with Cloud Firestore
@@ -290,19 +281,13 @@ function syncFromFirebase(){
 
 			}
 			syncGuestCount();
-
-
 	    });
-
 	});
-
-
-
-
 }
 
 
-
+// Processes a CSV row of guests and uploads to FB database
+// Ensure that row's columns match with data values
 function processCSVDataRow(row){
 	//attributes = ['Name','School','Committee','Delegation'];
 	var school = row[0]
@@ -322,6 +307,7 @@ function processCSVDataRow(row){
 
 }
 
+// Loads guest data locally
 function loadData(){
 	createGuestDataStructure(guestsBySchool);
 	loadSchoolListToAutoComplete(Object.keys(guestsBySchool));
@@ -329,7 +315,7 @@ function loadData(){
 
 }
 
-
+// Allows user to upload a CSV to load to firebase
 function UploadCSV() {
   var csvFileUpload = document.getElementById("csvFileUpload");
   var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
@@ -382,6 +368,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
 });
 
+// Sets the progress bar to the desired percentage
 function setProgressBarPercent(percent){
 	//round the percent first
 	var roundedPercent = Math.round(percent);
@@ -393,6 +380,7 @@ function setProgressBarPercent(percent){
 	progressBarHTML.innerHTML = roundedPercent+'%';
 }
 
+// Syncs the current guest count HTML item with the count in guestStates
 function syncGuestCount(){
 	var checkedInSoFar = 0;
 	var notCheckedInSoFar = 0;
@@ -416,25 +404,11 @@ function syncGuestCount(){
 
 }
 
-
-function incrementGuestCount(){
-	currentGuestCount++;
-	document.getElementById("currentGuestCount").innerHTML = currentGuestCount; 
-}
-
-function decrementGuestCount(){
-	if (currentGuestCount != 0){
-		currentGuestCount--;
-		document.getElementById("currentGuestCount").innerHTML = currentGuestCount; 
-	}
-}
-
+// Creates checkbox HTML item with desired ID, onchangefuntion and extra CSS class
 function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 		//add check in checkbox first
 	var formCheck = document.createElement('div');
 	formCheck.classList.add('form-check');
-
-
 	// inner elements of form check
 	var input = document.createElement('input');
 	input.classList.add('form-check-input');
@@ -445,7 +419,6 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 		if (extraClass == 'guestCheckBox'){
 			var checkInStatus = guestStates[checkboxID];
 			input.checked = checkInStatus;
-
 		}
 	}	
 	if (checkboxID){
@@ -453,11 +426,9 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 	}else{
 		input.setAttribute('id','noID');
 	}
-
 	if (onChangeFunction){
 		input.setAttribute('onchange',onChangeFunction);
 	}
-
 
 	var label = document.createElement('label');
 	label.setAttribute('class','form-check-label');
@@ -466,7 +437,7 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 
 	return formCheck;
 }
-
+// Applies logic when the 'select all' checkbox is clicked
 function selectAllCheckBoxes(){
 	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
 	var currentSelectAllState = document.getElementById('selectAll').checked;
@@ -486,24 +457,17 @@ function selectAllCheckBoxes(){
 
 			checkOutGuest(checkBox.id);
 			i++;				
-
 		}
-
-
 	}
 
 }
 
-
-
-
+// Creates and populates the guest list table of a desired school
 function createTable(targetSchool){
 
 	var grid = document.createElement("div");
 	grid.setAttribute("id","guestTable");
 
-	//create first row, with alphabet index
-	//var alphabetString ='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	var firstRow = document.createElement('div');
 	firstRow.setAttribute("class","gridRow");
 	var attributes = ['SelectAll','#','Name','School','Committee','Delegation'];
@@ -511,10 +475,7 @@ function createTable(targetSchool){
 	for (var i=0; i<cols; i++){
 		var cell = document.createElement('div');
 		cell.setAttribute("class","gridCell");
-
-
 		var attribute = attributes[i];
-
 		if (attribute == 'SelectAll'){
 			var child = createCheckBox('selectAll','selectAllCheckBoxes()');
 			cell.classList.add('checkBoxCell');
@@ -529,11 +490,7 @@ function createTable(targetSchool){
 	grid.appendChild(firstRow);
 
 	//Everything after first row
-
-
-
 	// DO IT THROUGH FB
-
 	// go through db
 	var indexNumber = 1; 
 	db.collection("students").get().then(function(querySnapshot) {
@@ -551,26 +508,22 @@ function createTable(targetSchool){
 
 
 			// sync with other open browsers with same school
-			//watchGuest(guestHash);
+			//watchGuest(guestHash); <-- TBD
 
 			// if row already exists or not target school, don't add
 			if (targetSchool != school || document.getElementById('row:'+guestHash)){
 				return;
 			}
 
-
 			// sync background color with check in status
 			if (checkInStatus){
 				gridRow.classList.add('checkedInRow');
 			}
-
 			gridRow.addEventListener("click", function (event){
 				console.log(guestHash);
 			});
 
-
 			//add check in checkbox 
-
 			var checkbox = createCheckBox(guestHash,"toggleGuestCheckIn('"+guestHash+"')",'guestCheckBox');
 
 			var indexCell = document.createElement('div');
@@ -595,34 +548,27 @@ function createTable(targetSchool){
 				var attribute = attributes[j]
 				if (attribute == 'CheckInStatus'){
 					continue;
-
 				} else{
 					var cellText = guestDict[attribute];
 					var cell = document.createElement('div');
 					cell.setAttribute('class','gridCell');
 					cell.innerHTML = cellText;				
-
 				}
-
 				gridRow.appendChild(cell);
 			}
 			grid.appendChild(gridRow);	        
-
-
 	    });
-
 	});
-
-
-
-
-
 	document.getElementById("guestList").appendChild(grid);
 };
+
+// Clears the guest list table
 function clearGuestList(){
 	document.getElementById("guestList").innerHTML = "";	
 
 }
+
+// Unused code
 
 // function populateGuestsOfMember(member){
 // 	clearGuestList();
