@@ -368,6 +368,88 @@ window.addEventListener('DOMContentLoaded', function(){
 
 });
 
+
+// Exports CSV file 
+function exportCSV(){
+	exportRowsToCsv('MITMUNCCheckInData', getArrayOfRowData());
+}
+
+
+// Returns a row array of all attendees
+function getArrayOfRowData(){	
+	var columns = ['School','Committee','Delegation','checkInStatus'];
+
+	var outputRows = [];
+	outputRows.push(columns);
+	let csvContent = "data:text/csv;charset=utf-8,";
+
+	var schools = Object.keys(guestsBySchool);
+
+	for (var i=0; i < schools.length;i++){
+		var school = schools[i];
+		var schoolStudents = (guestsBySchool[school]);
+		if (school == 'CATS Academy Boston'){
+
+
+		}
+		for (var j=0; j < schoolStudents.length;j++){
+			var rowArray = [];
+			var student = schoolStudents[j];
+			for (var k=0; k < columns.length; k++){
+				var field = student[columns[k]];
+				rowArray.push(field);
+			}
+			outputRows.push(rowArray);
+			if (school == 'CATS Academy Boston'){
+			}			
+		}
+	}
+	return outputRows;
+}
+
+// Export array of rows to CSV with custom filename
+function exportRowsToCsv(filename, rows) {
+    var processRow = function (row) {
+        var finalVal = '';
+        for (var j = 0; j < row.length; j++) {
+            var innerValue = row[j] === null ? '' : row[j].toString();
+            if (row[j] instanceof Date) {
+                innerValue = row[j].toLocaleString();
+            };
+            var result = innerValue.replace(/"/g, '""');
+            if (result.search(/("|,|\n)/g) >= 0)
+                result = '"' + result + '"';
+            if (j > 0)
+                finalVal += ',';
+            finalVal += result;
+        }
+        return finalVal + '\n';
+    };
+
+    var csvFile = '';
+    for (var i = 0; i < rows.length; i++) {
+        csvFile += processRow(rows[i]);
+    }
+
+    var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
+
+
 // Sets the progress bar to the desired percentage
 function setProgressBarPercent(percent){
 	//round the percent first
@@ -441,7 +523,6 @@ function createCheckBox(checkboxID=null,onChangeFunction=null,extraClass=null){
 function selectAllCheckBoxes(){
 	var currentGuestCheckBoxes = document.getElementsByClassName('guestCheckBox');
 	var currentSelectAllState = document.getElementById('selectAll').checked;
-	console.log(currentSelectAllState);
 	var i =0;
 	while (i <currentGuestCheckBoxes.length){
 		// unchecked -> checked
