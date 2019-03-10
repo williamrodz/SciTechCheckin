@@ -1,4 +1,5 @@
 // Initialize Firebase
+// API credentials should be updated here
 var config = {
   apiKey: "AIzaSyCuE1uw1toQDhgR0ccvV6QFBpm-1HwFYqM",
   authDomain: "mitmunc-checkin.firebaseapp.com",
@@ -103,7 +104,8 @@ function checkOutGuest(guestHash){
 
 }
 
-// Checks out ALL guests on the database. 
+// Checks out ALL guests on the database.
+// Only to be used for debugging purposes
 // CAREFUL!: No way to recover check in status
 // To do: add 'Are you sure option?' when this is called
 function checkOutAllGuests(){
@@ -156,7 +158,7 @@ function createGuestDataStructure(guestsDict){
 }
 
 
-// Upload a singular guest to the Firebase databse from its guest dictionary
+// Upload a single guest to the Firebase database from its guest dictionary
 function uploadDataToFirebase(guestDict) {
   	var guestHash = createDictionaryHash(guestDict);
 
@@ -185,12 +187,12 @@ function getListOfStudents(){
 	        console.log(doc.id, " => ", doc.data());
 	    });
 	});	
-
 }
 
 
-// Careful! Exhausts Firebase queries in less than three minutes
+// Careful! Exhausts Firebase daily queries limit in less than three minutes
 // Was an attempt to keep guest check in status synced between two simultaneous sessions 
+// Does not work 
 function watchGuest(guestHash){
 	var checkInstatusRef = db.ref('students/'+guestHash+'/checkInStatus');
 
@@ -221,10 +223,7 @@ function getCurrentGuestDictsFromFirebase(){
 	        students.push(guestDict);
 	    });
 	return students;
-
 	});
-
-
 }
 
 // Sync guestStates from firebase database
@@ -305,9 +304,7 @@ function UploadCSV() {
                       cell.innerHTML = cells[j];
                   }
               }
-	          console.log('Before load');
-	          console.log((guestsBySchool));
-	          console.log('After');
+
 	          loadData();              
           }
 
