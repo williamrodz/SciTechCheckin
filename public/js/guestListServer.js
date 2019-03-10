@@ -8,40 +8,11 @@ var config = {
   messagingSenderId: "355923752781"
 };
 firebase.initializeApp(config);
-
-
-
 const db = firebase.firestore();
 db.settings({ timestampsInSnapshots: true });
 
 
-
-
-// var guestsByMember = {"Ali":["Jack","John","France"],"Ana":["Kat","Joe","Julia"]};
-
-// var sampleSchools = {'TestSchool':[{'Name':'Rodorigesu','FirstName':'Uiriamu','School':'MIT','Committee':'UNSC','Delegation':'Yudonia'}
-// ,{'Name':'Bunny','FirstName':'Bad','School':'Latin Trap','Committee':'PR','Delegation':'Mia'},
-// {'Name':'Banana','FirstName':'Guineo','School':'Banano','Committee':'Potasium','Delegation':'K'}],
-// "TestSchool2":
-// [{'Name':'gato','FirstName':'miau','School':'fish','Committee':'tips','Delegation':'Yudonia'}
-// ,{'Name':'Bunny','FirstName':'Benito','School':'Latin Trap 2','Committee':'h','Delegation':'tuya'},
-// {'Name':'toddyno','FirstName':'anitta','School':'moffin','Committee':'tastee','Delegation':'wow'}]};
-
-// for (var i =0; i < Object.keys(sampleSchools).length; i++){
-// 	var school = Object.keys(sampleSchools)[i];
-// 	for (var j =0; j < (sampleSchools[school]).length; j++){
-// 		student = sampleSchools[school][j];
-// 		student['CheckInStatus'] = false;
-// 	}
-// }
-
-
-
-
-var guestsBySchool = {};
-
-
-
+var guestsBySchool = {}; //local JS record of guests is stored here
 
 var guestStates = {};
 var defaultInitialGuestCount = 0;

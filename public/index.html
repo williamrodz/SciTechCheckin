@@ -15,6 +15,8 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.7.3/firebase.js"></script>
   <script src="js/guestListServer.js"></script>
+  <link rel="icon" href="http://www.mitmunc.org/assets/mitmunc_logo_circular-8b1918716af1cc2925525ea7e2a2b3dd5a99cee760fbe46cb95f6c0d7b7e62db.png">
+
 
 
   </head>
@@ -27,9 +29,9 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
       <a class="navbar-brand" href="#">MITMUNC Check-In</a>
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-        <li class="nav-item active">
+<!--         <li class="nav-item active">
           <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
+        </li> -->
         <li class="nav-item">
           <a class="nav-link" onclick= "toggleHideHTMLElement('uploadCSVDiv')" href="#">Upload CSV</a>
         </li>
@@ -39,7 +41,7 @@
         </li>        
 <!--         Update href link above with year's assignment sheet.-->
         <li class="nav-item">
-          <a class="nav-link" onclick= "exportCSV()" href="#">Export Current Check In Data CSV</a>
+          <a class="nav-link" onclick= "exportCSV()" href="#">Export CSV</a>
         </li>
         </ul>
 
@@ -48,6 +50,7 @@
   <body class="pageBody">
     <div class="uploadCSVDiv hiddenItem" id="uploadCSVDiv">
       <input type="file" id="csvFileUpload" />
+      Make sure columns are in this order: school, committee, delegation, full name of delegate
       <input type="button" id="upload" value="UploadCSV" onclick = "UploadCSV()" />
     </div>
     <div class="checkInMonitor">
@@ -85,9 +88,9 @@
       <label class='schoolNameLabel'>Instructions</label>
       <div class='instructionsText'>
         <ol>
-        <li>Ask for advisor and school name to conduct check-in process. Only registered advisor is allowed to do check in. Ask for them to hand-in release forms. <strong>No forms = no check-in.</strong></li>
+        <li>Ask for school name to conduct check-in process. Only registered advisor is allowed to do check in. Ask for them to hand-in release forms. <strong>No forms = no check-in.</strong></li>
         <li>Begin typing school name and select it in dropdown. Confirm number of delegates and their names, one by one. <strong>Only check in delegates who will be at conference.</strong></li>
-        <li>Give delegate packs to corresponding number of delegates. Give faculty packs to advisors. NO EXTRAS due to capacity constraints.</li>
+        <li>Give delegate packs to corresponding number of delegates. Give faculty packs to advisors. These have name tags inside. Inform them that placards will be distributed at committee.</li>
       </ol>
       </div>
 
