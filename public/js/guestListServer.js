@@ -1,5 +1,17 @@
 // Initialize Firebase
 // API credentials should be updated here
+
+// To do every year:
+// 1) Update config file below. Must have at least the lowest paid plan to have enough database queries for check in day
+// 2) Delete delegates in database if any. Upload current year's guest CSV.
+// 3) Update Master Assignments Sheet link in HTML 
+// 4) Review and improve code
+
+//--Left to do---
+// 1) Synchrony between two open check in windows. 
+//    You currently need to refresh the site to have the 
+//    updates from another session to show up in check in count
+
 var config = {
   apiKey: "AIzaSyCuE1uw1toQDhgR0ccvV6QFBpm-1HwFYqM",
   authDomain: "mitmunc-checkin.firebaseapp.com",
