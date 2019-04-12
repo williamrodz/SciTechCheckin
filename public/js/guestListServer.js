@@ -65,6 +65,14 @@ function loadSchoolListToAutoComplete(schoolList){
 }
 
 
+function loadAttendeeToAutocomplete(attendee){
+	dataList = document.getElementById("attendeeList");
+	optionHTML = document.createElement("option");
+	optionHTML.setAttribute("value",attendee);
+	dataList.appendChild(optionHTML);		
+
+}
+
 // Record in local guestStates dictionary and then change CSS if active
 function checkInGuest(guestHash){
 	console.log('went in ');
@@ -192,13 +200,28 @@ function uploadDataToFirebase(guestDict) {
 
 // For debugging purposes
 // Logs the list of students with their data in the console
-function getListOfStudents(){
+function printListOfStudents(){
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
 	        // doc.data() is never undefined for query doc snapshots
 	        console.log(doc.id, " => ", doc.data());
 	    });
 	});	
+}
+
+function getListOfAttendeeDictionaries(){
+	var attendees = []
+	var attendeesSoFar = 0
+	db.collection("students").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        //console.log(doc.id, " => ", doc.data());
+	        attendees.push(doc.data());
+	        attendeesSoFar += 1;
+	        console.log(attendeesSoFar);
+	    });
+		return attendees;
+	});
 }
 
 
@@ -343,7 +366,13 @@ window.addEventListener('DOMContentLoaded', function(){
 				clearGuestList();
 				createTable(currentMemberInput);
 			}
+			hideSettingsSection();
 
+			//load participants
+			var attendees = getListOfAttendeeDictionaries();
+			for (i = 0; i < attendees.length; i++) { 
+			  loadAttendeeToAutocomplete(attendees[0]["Name"]);
+			}
 		});
 
 });
@@ -627,6 +656,48 @@ function createTable(targetSchool){
 function clearGuestList(){
 	document.getElementById("guestList").innerHTML = "";	
 
+}
+
+function hideSettingsSection(){
+	let root = document.documentElement;
+	root.style.setProperty('--settingsDisplayStatus', "none");
+}
+
+function revealSettingsSection(){
+	let root = document.documentElement;
+	root.style.setProperty('--settingsDisplayStatus', "flex");
+}
+
+function clickOnSettingsButton(){
+	document.getElementsByClassName("instructionsSection")[0].classList.add("hiddenItem");
+	document.getElementsByClassName("schooNameSection")[0].classList.add("hiddenItem");
+	document.getElementsByClassName('attendeesSection')[0].classList.add("hiddenItem");
+	document.getElementsByClassName('checkInMonitor')[0].classList.add("hiddenItem");
+	document.getElementsByClassName('schoolStudentsLabel')[0].classList.add("hiddenItem");
+	revealSettingsSection();
+
+}
+
+function escapeSettings(){
+	document.getElementsByClassName("instructionsSection")[0].classList.remove("hiddenItem");
+	document.getElementsByClassName("schooNameSection")[0].classList.remove("hiddenItem");
+	document.getElementsByClassName('attendeesSection')[0].classList.remove("hiddenItem");
+	document.getElementsByClassName('checkInMonitor')[0].classList.remove("hiddenItem");
+	document.getElementsByClassName('schoolStudentsLabel')[0].classList.remove("hiddenItem");
+	hideSettingsSection();
+}
+
+function setNavBarColor(){
+	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
+	console.log("changing color to",rawNavBarColorInput);
+	let root = document.documentElement;
+	root.style.setProperty('--customNavBarColor', rawNavBarColorInput);
+
+}
+
+function saveSettingsButton(){
+	setNavBarColor();
+	escapeSettings();
 }
 
 // Unused code

@@ -32,12 +32,15 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" target="_blank" href="https://docs.google.com/spreadsheets/d/1G2CNtb4VXNooC-8G1G-oTF_C4VJDEbkIrq0EMysHr9E/edit?usp=sharing">Master Assignments Sheet. Use if app not working</a>
+          <a class="nav-link" title="Use if app not working" target="_blank" href="https://docs.google.com/spreadsheets/d/1G2CNtb4VXNooC-8G1G-oTF_C4VJDEbkIrq0EMysHr9E/edit?usp=sharing">Master Assignments Sheet</a>
         </li>        
 <!--         Update href link above with current year's assignment sheet.-->
         <li class="nav-item">
           <a class="nav-link" onclick= "exportCSV()" href="#">Export CSV</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="clickOnSettingsButton()"href="#">Settings</a>
+        </li>        
         </ul>
 
     </div>
@@ -79,7 +82,7 @@
     </div>
 
 
-    <div class=instructionsSection>
+    <div class=instructionsSection id="instructionsSection">
       <label class='schoolNameLabel'>Instructions</label>
       <div class='instructionsText'>
         <ol>
@@ -90,18 +93,48 @@
       </div>
 
     </div>
-    <form>
-     <div class="form-group guestNameInput">
-       <label class='schoolNameLabel'>School Name</label>
-       <datalist id="schoolList">
-       </datalist>       
-       <input type="text" class="form-control" id="memberNameInput" placeholder="e.g. Cambridge High School" list="schoolList">
-     </div>  
-   </form>    
-
-   <label class='schoolStudentsLabel'>School's Students</label>
+    <div class="schooNameSection" id="schooNameSection">
+      <form>
+       <div class="form-group guestNameInput">
+         <label class='schoolNameLabel'>School Name</label>
+         <datalist id="schoolList">
+         </datalist>       
+         <input type="text" class="form-control" id="memberNameInput" placeholder="e.g. Cambridge High School" list="schoolList">
+       </div>  
+     </form>
+  </div>
+  <div class="attendeesSection" id="attendeesSection">
+   <p class='schoolStudentsLabel'>School's Students</p>
    <div class="list-group" id="guestList">
    </div>
+  </div>
+  <div class="settingsSection">
+      <h2>Settings</h2>
+      <ul>
+        <li>Navbar Color<input id="navBarColorInput" type="text" name="navBarColor" value="#008000"><br> </li>
+        <li>Check-in Mode
+          <select name="Mode">
+          <option value="masterCheckIn">Master Check In</option>
+          <option value="selfCheckIn">Self Check-In</option>
+          </select>
+        </li>        
+      </ul>
+      <button type="button" onclick="saveSettingsButton()">Save Settings</button>
+
+  </div>
+  <div class="selfCheckInSection">
+    <h2>Welcome to the conference!</h2>
+    <input class="selfCheckInInput" type="text" id="selfCheckInInput" placeholder="Type your name here...">
+    <div class="form-group guestNameInput">
+     <datalist id="attendeeList">
+     </datalist>       
+     <input type="text" class="form-control" id="attendeeNameInput" placeholder="e.g. Cambridge High School" list="attendeeList">
+    </div>      
+    <button type="button" onclick="">Check In</button>
+
+
+
+  </div>
 
    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
