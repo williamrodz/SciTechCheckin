@@ -387,13 +387,14 @@ window.addEventListener('DOMContentLoaded', function(){
 			hideSettingsSection();
 		});
 
-	document.getElementById('selfCheckInNameInput').addEventListener("keyup",
+	document.getElementById('selfCheckInNameInput').addEventListener("change",
 		function (event){
 			var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
 
 			if (getGlobalAttendeesNames().includes(currentAttendeeInput)){
 				//enable Check-In Button
 				enableCheckInButton();
+
 			} else{
 				disableCheckInButton();
 			}
@@ -412,10 +413,20 @@ function disableCheckInButton(){
 }
 
 function clickCheckInButton(){
+
 	var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
-	createDictionaryHash
-
-
+	var optionList = document.getElementsByClassName("unselectedName");
+	var guestHash = "";
+	for (var i=0; i < optionList.length; i++){
+		currentOption = optionList[i];
+		if (currentOption.getAttribute("value") == currentAttendeeInput){
+			guestHash = currentOption.getAttribute("hash");
+			break;
+		}
+	}	
+	if (guestHash != ""){
+		checkInGuest(guestHash);
+	} 
 }
 
 // Exports CSV file 
