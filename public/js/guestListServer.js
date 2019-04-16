@@ -32,6 +32,7 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 
+
 // Takes any html element ID and add the hidden CSS class
 function toggleHideHTMLElement(domID){
 	var classList = document.getElementById(domID).classList;
@@ -65,10 +66,12 @@ function loadSchoolListToAutoComplete(schoolList){
 }
 
 
-function loadAttendeeToAutocomplete(attendee){
+function loadAttendeeToAutocomplete(attendeeDictionary){
 	dataList = document.getElementById("attendeeList");
 	optionHTML = document.createElement("option");
-	optionHTML.setAttribute("value",attendee);
+	optionHTML.classList.add("unselectedName");
+	optionHTML.setAttribute("value",attendeeDictionary["Name"]);
+	optionHTML.setAttribute("hash",createDictionaryHash(attendeeDictionary));
 	dataList.appendChild(optionHTML);		
 
 }
@@ -133,7 +136,6 @@ function checkOutAllGuests(){
 	    querySnapshot.forEach(function(doc) {
 	        // doc.data() is never undefined for query doc snapshots
 	        var guestHash = doc.id;
-	        //console.log('pushing');
 	        checkOutGuest(guestHash);
 	    });	
 
@@ -209,19 +211,34 @@ function printListOfStudents(){
 	});	
 }
 
-function getListOfAttendeeDictionaries(){
+globalAttendees = []
+function loadAttendeeDataIntoGlobalArray(){
 	var attendees = []
 	var attendeesSoFar = 0
+	var notFinished = true;
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
 	        // doc.data() is never undefined for query doc snapshots
 	        //console.log(doc.id, " => ", doc.data());
-	        attendees.push(doc.data());
+	        localAttendeeData = doc.data();
+	        attendees.push(localAttendeeData);
+	        globalAttendees.push(localAttendeeData);
 	        attendeesSoFar += 1;
-	        console.log(attendeesSoFar);
+	        console.log("Processed",localAttendeeData);
 	    });
-		return attendees;
+	}).then( function(attendees){
+		for (i = 0; i < globalAttendees.length; i++) { 
+		  loadAttendeeToAutocomplete(globalAttendees[i]);
+		}
 	});
+}
+
+function getGlobalAttendeesNames(){
+	names = []
+	for (i = 0; i < globalAttendees.length; i++) { 
+	  names.push(globalAttendees[i]["Name"]);
+	}	
+	return names;
 }
 
 
@@ -355,7 +372,8 @@ function UploadCSV() {
 
 window.addEventListener('DOMContentLoaded', function(){
 
-	//loadData();
+	hideSettingsSection();
+	loadAttendeeDataIntoGlobalArray();
 	syncFromFirebase();
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
@@ -367,16 +385,38 @@ window.addEventListener('DOMContentLoaded', function(){
 				createTable(currentMemberInput);
 			}
 			hideSettingsSection();
-
-			//load participants
-			var attendees = getListOfAttendeeDictionaries();
-			for (i = 0; i < attendees.length; i++) { 
-			  loadAttendeeToAutocomplete(attendees[0]["Name"]);
-			}
 		});
 
+	document.getElementById('selfCheckInNameInput').addEventListener("keyup",
+		function (event){
+			var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
+
+			if (getGlobalAttendeesNames().includes(currentAttendeeInput)){
+				//enable Check-In Button
+				enableCheckInButton();
+			} else{
+				disableCheckInButton();
+			}
+			hideSettingsSection();
+
+		});	
 });
 
+function enableCheckInButton(){
+	document.getElementById("checkInButton").disabled = false;
+}
+
+function disableCheckInButton(){
+	document.getElementById("checkInButton").disabled = true;
+
+}
+
+function clickCheckInButton(){
+	var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
+	createDictionaryHash
+
+
+}
 
 // Exports CSV file 
 function exportCSV(){
@@ -689,7 +729,6 @@ function escapeSettings(){
 
 function setNavBarColor(){
 	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
-	console.log("changing color to",rawNavBarColorInput);
 	let root = document.documentElement;
 	root.style.setProperty('--customNavBarColor', rawNavBarColorInput);
 
@@ -699,92 +738,3 @@ function saveSettingsButton(){
 	setNavBarColor();
 	escapeSettings();
 }
-
-// Unused code
-
-// function populateGuestsOfMember(member){
-// 	clearGuestList();
-// 	console.log('here');
-
-// 	guests = Object.keys(guestsByMemberWithState[member]);
-// 	for (var i =0; i <guests.length; i++){
-// 		guestObject = guestsByMemberWithState[member][guests[i]];
-// 		name = guestObject['name'];
-// 		checkedin = guestObject['checkedin'];
-
-
-// 		var guestHTML = document.createElement("a");
-// 		var guestHTMLClass= "list-group-item list-group-item-action";
-// 		guestHTML.setAttribute("class",guestHTMLClass);
-// 		guestHTML.setAttribute("href","#");
-// 		guestHTML.innerHTML = name;
-
-
-// 		var buttonHTML = document.createElement("button");
-// 		buttonHTML.setAttribute("type","button");
-// 		buttonHTML.setAttribute("class","btn btn-primary checkInButton");
-
-// 		buttonHTML.setAttribute("id","@:"+member+"#:"+name);
-
-// 		buttonHTML.addEventListener("mouseup", function (event){
-// 			buttonHTML = event.target;
-// 			buttonIDString = buttonHTML.getAttribute("id");
-// 			guestNameIndex = buttonIDString.indexOf("#:");
-// 			memberName = buttonIDString.substring(2,guestNameIndex);
-// 			guestName = buttonIDString.substring(guestNameIndex+2);
-		
-
-// 			checkInMembersGuest(memberName,guestName);
-// 			buttonHTML.classList.remove("btn-success");			
-// 			buttonHTML.classList.add("disabled");
-// 			buttonHTML.innerHTML = "Checked-in";
-
-// 		});
-
-// 		if (!checkedin){
-// 			buttonHTML.classList.add("btn-success");
-// 			buttonHTML.innerHTML = "Check-in";
-
-// 		}
-// 		else{
-// 			buttonHTML.classList.add("disabled");
-// 			buttonHTML.innerHTML = "Checked-in"
-
-// 		}
-// 		guestHTML.appendChild(buttonHTML);
-
-// 		document.getElementById("guestList").appendChild(guestHTML);	
-// 	}
-
-// }
-
-
-
-// function populateGuestList(){
-// 	var guestHTML = document.createElement("a");
-// 	var guestHTMLClass= "list-group-item list-group-item-action";
-// 	guestHTML.setAttribute("class",guestHTMLClass);
-// 	guestHTML.setAttribute("href","#");
-// 	guestHTML.innerHTML = "Jenny Jin";
-
-
-// 	var buttonHTML = document.createElement("button");
-// 	buttonHTML.setAttribute("type","button");
-// 	buttonHTML.setAttribute("class","btn btn-primary");
-// 	buttonHTML.innerHTML = "Check-in";
-// 	buttonHTML.addEventListener("mouseup", function(event){
-// 		buttonHTML.classList.remove("btn-primary");
-// 		buttonHTML.innerHTML = "Checked In";
-// 		buttonHTML.classList.add("btn-success");
-// 		buttonHTML.classList.add("disabled");
-
-// 	},false);
-
-// 	guestHTML.appendChild(buttonHTML);
-
-
-// 	document.getElementById("guestList").appendChild(guestHTML);	
-
-// }
-
-

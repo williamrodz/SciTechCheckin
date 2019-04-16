@@ -124,13 +124,14 @@
   </div>
   <div class="selfCheckInSection">
     <h2>Welcome to the conference!</h2>
-    <input class="selfCheckInInput" type="text" id="selfCheckInInput" placeholder="Type your name here...">
-    <div class="form-group guestNameInput">
-     <datalist id="attendeeList">
-     </datalist>       
-     <input type="text" class="form-control" id="attendeeNameInput" placeholder="e.g. Cambridge High School" list="attendeeList">
-    </div>      
-    <button type="button" onclick="">Check In</button>
+      <form>
+       <div class="form-group guestNameInput">
+         <datalist id="attendeeList">
+         </datalist>       
+         <input type="text" class="form-control" id="selfCheckInNameInput" placeholder="e.g. Cambridge High School" list="attendeeList">
+       </div>  
+     </form>  
+    <button id="checkInButton" type="button" onclick="" disabled="true">Check In</button>
 
 
 
