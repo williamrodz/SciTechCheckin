@@ -1,7 +1,14 @@
 :root{
 	--progressBarWidth:0%;
 	--customNavBarColor :darkred;
-	--settingsDisplayStatus :none;
+
+	/* Nomenclature is className+"display"*/
+	--checkInMonitorDisplay:flex;
+	--instructionsSectionDisplay:flex;
+	--schoolNameSectionDisplay:flex;
+	--attendeesSectionDisplay:flex;
+	--selfCheckInSectionDisplayStatus: flex;
+	--settingsSectionDisplay :none;
 }
 
 .navbar{
@@ -26,7 +33,7 @@
 }
 
 .checkInMonitor{
-	display: flex;
+	display: var(--checkInMonitorDisplay);
 	flex-direction: column;
 	align-items: center;
 
@@ -46,6 +53,10 @@
 	flex-direction: column;
 	width: 100%;
 	align-items: center;
+}
+
+.instructionsSection{
+	display: var(--instructionsSectionDisplay);
 }
 
 
@@ -68,7 +79,7 @@
 }
 
 .attendeesSection{
-	display: flex;
+	display: var(--attendeesSectionDisplay);
 	flex-direction: column;	
 	}   
 
@@ -78,6 +89,9 @@
 	
 }
 
+.schoolNameSection{
+	display: var(--schoolNameSectionDisplay);
+}
 .schoolNameLabel{
 	font-size: 30px;
 }
@@ -126,19 +140,19 @@
 }
 
 .settingsSection{
-	display: var(--settingsDisplayStatus);
+	display: var(--settingsSectionDisplay);
 	flex-direction: column;
 }
 
 .selfCheckInSection{
-	display: flex;
+	display: var(--selfCheckInSectionDisplay);
 	flex-direction: column;
 	text-align: center;
 }
 
-.selfCheckInInput{
-  height:70px
-  font-size: 24px;
+.selfCheckInNameInput{
+  height:100px;
+  font-size: 36px;
 }
 
 

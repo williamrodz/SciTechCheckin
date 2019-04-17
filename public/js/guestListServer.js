@@ -31,6 +31,7 @@ var guestStates = {};
 var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
+var checkInMode = "SELFCHECKIN";
 
 
 // Takes any html element ID and add the hidden CSS class
@@ -373,6 +374,9 @@ function UploadCSV() {
 window.addEventListener('DOMContentLoaded', function(){
 
 	hideSettingsSection();
+	if (checkInMode == "SELFCHECKIN"){
+		hid
+	}
 	loadAttendeeDataIntoGlobalArray();
 	syncFromFirebase();
 	document.getElementById('memberNameInput').addEventListener("keyup",
@@ -387,10 +391,10 @@ window.addEventListener('DOMContentLoaded', function(){
 			hideSettingsSection();
 		});
 
-	document.getElementById('selfCheckInNameInput').addEventListener("change",
+	document.getElementById('selfCheckInNameInput').addEventListener("keyup",
 		function (event){
 			var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
-
+			console.log("pressed");
 			if (getGlobalAttendeesNames().includes(currentAttendeeInput)){
 				//enable Check-In Button
 				enableCheckInButton();
@@ -402,6 +406,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
 		});	
 });
+
 
 function enableCheckInButton(){
 	document.getElementById("checkInButton").disabled = false;
@@ -709,34 +714,51 @@ function clearGuestList(){
 
 }
 
-function hideSettingsSection(){
+function hideSectionByClass(className){
 	let root = document.documentElement;
-	root.style.setProperty('--settingsDisplayStatus', "none");
+	let cssDisplayVariable = "--"+className+"Display";
+	root.style.setProperty(cssDisplayVariable, "none");	
 }
 
-function revealSettingsSection(){
+function revealSectionByClass(className){
 	let root = document.documentElement;
-	root.style.setProperty('--settingsDisplayStatus', "flex");
+	let cssDisplayVariable = "--"+className+"Display";
+	root.style.setProperty(cssDisplayVariable, "flex");	
 }
+
+
 
 function clickOnSettingsButton(){
-	document.getElementsByClassName("instructionsSection")[0].classList.add("hiddenItem");
-	document.getElementsByClassName("schooNameSection")[0].classList.add("hiddenItem");
-	document.getElementsByClassName('attendeesSection')[0].classList.add("hiddenItem");
-	document.getElementsByClassName('checkInMonitor')[0].classList.add("hiddenItem");
-	document.getElementsByClassName('schoolStudentsLabel')[0].classList.add("hiddenItem");
-	revealSettingsSection();
+	hideSectionByClass("checkInMonitor");
+	hideSectionByClass("instructionsSection");
+	hideSectionByClass("schoolNameSection");
+	hideSectionByClass("attendeesSection");
+	hideSectionByClass("selfCheckInSection");
+	revealSectionByClass("settingsSection");
 
 }
 
 function escapeSettings(){
-	document.getElementsByClassName("instructionsSection")[0].classList.remove("hiddenItem");
-	document.getElementsByClassName("schooNameSection")[0].classList.remove("hiddenItem");
-	document.getElementsByClassName('attendeesSection')[0].classList.remove("hiddenItem");
-	document.getElementsByClassName('checkInMonitor')[0].classList.remove("hiddenItem");
-	document.getElementsByClassName('schoolStudentsLabel')[0].classList.remove("hiddenItem");
-	hideSettingsSection();
+	if (checkInMode != "SELFCHECKIN"){
+		revealSectionByClass("checkInMonitor");
+		revealSectionByClass("instructionsSection");
+		revealSectionByClass("schoolNameSection");
+		revealSectionByClass("attendeesSection");
+		hideSectionByClass("selfCheckInSection");
+
+
+	} else{
+		hideSectionByClass("checkInMonitor");
+		hideSectionByClass("instructionsSection");
+		hideSectionByClass("schoolNameSection");
+		hideSectionByClass("attendeesSection");
+		revealSectionByClass("selfCheckInSection");
+
+	}
+	hideSectionByClass("settingsSection");
+
 }
+
 
 function setNavBarColor(){
 	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;

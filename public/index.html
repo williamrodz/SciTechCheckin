@@ -93,7 +93,7 @@
       </div>
 
     </div>
-    <div class="schooNameSection" id="schooNameSection">
+    <div class="schoolNameSection" id="schooNameSection">
       <form>
        <div class="form-group guestNameInput">
          <label class='schoolNameLabel'>School Name</label>
@@ -108,10 +108,22 @@
    <div class="list-group" id="guestList">
    </div>
   </div>
+
+  <div class="selfCheckInSection">
+    <h2>Welcome to the conference!</h2>
+      <form>
+       <div class="form-group guestNameInput">
+         <datalist id="attendeeList">
+         </datalist>       
+         <input type="text" class="form-control selfCheckInNameInput" id="selfCheckInNameInput" placeholder="e.g. Cambridge High School" list="attendeeList">
+       </div>  
+     </form>  
+    <button id="checkInButton" type="button" onclick="clickCheckInButton()" disabled="true">Check In</button>
+  </div>
   <div class="settingsSection">
       <h2>Settings</h2>
       <ul>
-        <li>Navbar Color<input id="navBarColorInput" type="text" name="navBarColor" value="#008000"><br> </li>
+        <li>Navbar Color<input id="navBarColorInput" type="text" name="navBarColor" value="#FF0000"><br> </li>
         <li>Check-in Mode
           <select name="Mode">
           <option value="masterCheckIn">Master Check In</option>
@@ -120,22 +132,7 @@
         </li>        
       </ul>
       <button type="button" onclick="saveSettingsButton()">Save Settings</button>
-
-  </div>
-  <div class="selfCheckInSection">
-    <h2>Welcome to the conference!</h2>
-      <form>
-       <div class="form-group guestNameInput">
-         <datalist id="attendeeList">
-         </datalist>       
-         <input type="text" class="form-control" id="selfCheckInNameInput" placeholder="e.g. Cambridge High School" list="attendeeList">
-       </div>  
-     </form>  
-    <button id="checkInButton" type="button" onclick="clickCheckInButton()" disabled="true">Check In</button>
-
-
-
-  </div>
+  </div>  
 
    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
