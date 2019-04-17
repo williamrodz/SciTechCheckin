@@ -34,6 +34,7 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 var checkInMode = "SELFCHECKIN"; //"SELFCHECKIN" or "MASTER"
+var additionalAttributes = []; //attributes other than School or Name 
 
 
 // Takes any html element ID and add the hidden CSS class
@@ -326,6 +327,7 @@ function syncFromFirebase(){
 // You can listen to a document with the onSnapshot() method. An initial call using the callback you provide creates a document snapshot immediately with the current contents of the single document. Then, each time the contents change, another call updates the document snapshot.
 	syncSettings();
 	// go through db
+	gotAdditionalAttributes = false;
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
 	        // doc.data() is never undefined for query doc snapshots
@@ -333,6 +335,20 @@ function syncFromFirebase(){
 	        var guestDict = doc.data();
 	        var checkInStatus = guestDict['checkInStatus'];
 	        var school = guestDict['School'];
+
+	        //verify additional attributes
+	        if (gotAdditionalAttributes == false){
+		        guestDictAttributes = Object.keys(guestDict);
+		        for (var i=0 ; i <guestDictAttributes.length; i++){
+		        	localAttribute = guestDictAttributes[i];
+		        	if (localAttribute != "School" && localAttribute != "checkInStatus" 
+		        		&& localAttribute !="Name"){
+		        		additionalAttributes.push(localAttribute);
+		        	}
+		        }
+		        gotAdditionalAttributes = true	        	
+	        }
+
 
 	        guestStates[guestHash] = checkInStatus;
 
@@ -669,7 +685,11 @@ function createTable(targetSchool){
 
 	var firstRow = document.createElement('div');
 	firstRow.setAttribute("class","gridRow");
-	var attributes = ['SelectAll','#','Name','School','Committee','Delegation'];
+	var attributes = ['SelectAll','#','Name','School'];//'Committee','Delegation'];
+	for (var i=0; i < additionalAttributes.length; i++){
+		additionalAttribute = additionalAttributes[i];
+		attributes.push(additionalAttribute);
+	}
 	var cols = attributes.length;
 	for (var i=0; i<cols; i++){
 		var cell = document.createElement('div');
@@ -741,10 +761,15 @@ function createTable(targetSchool){
 			indexNumber++;
 
 			//Add content cells
-			var attributes = ['CheckInStatus','Name','School','Committee','Delegation'];
+			var cellAttributes = ['CheckInStatus','Name','School'];//,'Committee','Delegation'];
+			//additional attributes
+			for (var i=0; i < additionalAttributes.length; i++){
+				additionalAttribute = additionalAttributes[i];
+				cellAttributes.push(additionalAttribute);
+			}			
 
-			for (var j=0; j<attributes.length; j++){
-				var attribute = attributes[j]
+			for (var j=0; j<cellAttributes.length; j++){
+				var attribute = cellAttributes[j]
 				if (attribute == 'CheckInStatus'){
 					continue;
 				} else{
@@ -852,8 +877,11 @@ function saveSettingsButton(){
 
 	var checkInModeDropDown = document.getElementById("checkInModeDropdown");
 	var selectedCheckInMode = checkInModeDropDown.options[checkInModeDropDown.selectedIndex].value;
-	checkInMode = selectedCheckInMode;
+	if (selectedCheckInMode == "noneSelected"){
+		selectedCheckInMode = checkInMode;
+	}
 
+	checkInMode = selectedCheckInMode;
 	// persist to Firebase
 	db.collection("settings").doc("customSettings").update({
 	    'checkInMode':selectedCheckInMode,
