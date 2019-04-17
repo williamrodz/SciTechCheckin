@@ -161,8 +161,18 @@ function toggleGuestCheckIn(guestHash){
 
 // Creates hash to be used for database and ID in HTML row for a particular guest
 function createDictionaryHash(dictionary){
+	// -- new method --
+	var attributes = Object.keys(dictionary);
+	attributes.sort();
+	dictionaryHash = "";
 
-	dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
+	for (var i=0; i <attributes.length; i++){
+		var attribute = attributes[i];
+		dictionaryHash += attribute + "{"+dictionary[attribute]+"}";
+	}
+
+	// --- old method ---
+	//dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
 	return dictionaryHash;
 
 }
@@ -187,19 +197,22 @@ function createGuestDataStructure(guestsDict){
 function uploadDataToFirebase(guestDict) {
   	var guestHash = createDictionaryHash(guestDict);
 
-	db.collection("students").doc(guestHash).set({
-	    'Name': guestDict['Name'],
-	    'School': guestDict['School'],
-	    'Committee': guestDict['Committee'],
-	    'Delegation' : guestDict['Delegation'],
-	    'checkInStatus':guestDict['checkInStatus']
-	        })
-		.then(function() {
-		    console.log("Document successfully written!");
-		})
-		.catch(function(error) {
-		    console.error("Error writing document: ", error);
-		});
+  	var attributes = Object.keys(guestDict);
+  	for (var i=0; i <attributes.length; i++){
+  		attribute = attributes[i];
+
+		db.collection("students").doc(guestHash).set({
+		    attribute: guestDict[attribute],
+		        })
+			.then(function() {
+			    console.log("Document successfully written!");
+			})
+			.catch(function(error) {
+			    console.error("Error writing document: ", error);
+			});  		
+  	}
+
+
 
 }
 
@@ -338,15 +351,23 @@ function syncFromFirebase(){
 
 // Processes a CSV row of guests and uploads to FB database
 // Ensure that row's columns match with data values
-function processCSVDataRow(row){
+function processCSVDataRow(row,firstRowAttributes){
 	//attributes = ['Name','School','Committee','Delegation'];
-	var school = row[0]
-	var committee = row[1]
-	var delegation = row[2]	
-	var name = row[3]
 
-	var newGuestDict = {'Name':name,"School":school,'Committee':committee, 'Delegation':delegation, 'checkInStatus':false};
+	// ----old method---
+	// var school = row[0]
+	// var committee = row[1]
+	// var delegation = row[2]	
+	// var name = row[3]
 
+	// var newGuestDict = {'Name':name,"School":school,'Committee':committee, 'Delegation':delegation, 'checkInStatus':false};
+
+	// ----new method----
+	var newGuestDict = {};
+	for (var i=0; i < firstRowAttributes.length; i++){
+		attribute = firstRowAttributes[i];
+		newGuestDict[attribute] = row[i];
+	}
 	uploadDataToFirebase(newGuestDict);
 
 	if (guestsBySchool[school]){
@@ -375,10 +396,14 @@ function UploadCSV() {
           reader.onload = function (e) {
               var table = document.createElement("table");
               var rows = e.target.result.split("\n");
+
+              firstRow = rows[0];
+              firstRowAttributes = firstRow.split(",");
+
               for (var i = 0; i < rows.length; i++) {
                   var row = table.insertRow(-1);
                   var cells = rows[i].split(",");
-                  processCSVDataRow(cells);
+                  processCSVDataRow(cells,firstRowAttributes);
                   for (var j = 0; j < cells.length; j++) {
                       var cell = row.insertCell(-1);
                       cell.innerHTML = cells[j];
@@ -413,7 +438,7 @@ window.addEventListener('DOMContentLoaded', function(){
 			} else{
 				clearGuestList();
 			}
-			hideSettingsSection();
+			hideSectionByClass("settingsSection");
 		});
 
 	document.getElementById('selfCheckInNameInput').addEventListener("keyup",
@@ -827,13 +852,6 @@ function saveSettingsButton(){
 
 	var checkInModeDropDown = document.getElementById("checkInModeDropdown");
 	var selectedCheckInMode = checkInModeDropDown.options[checkInModeDropDown.selectedIndex].value;
-	// if (selectedValue == "Self Check-In"){
-	// 	checkInModeToUpload = "SELFCHECKIN";
-	// 	console.log("Changed to self check in");
-	// } else {
-	// 	checkInModeToUpload = "MASTER";
-	// 	console.log("changed to master");
-	// }
 	checkInMode = selectedCheckInMode;
 
 	// persist to Firebase
