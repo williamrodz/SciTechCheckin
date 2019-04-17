@@ -11,6 +11,8 @@
 // 1) Synchrony between two open check in windows. 
 //    You currently need to refresh the site to have the 
 //    updates from another session to show up in check in count
+// 2) settings being only available option with selfcheck in mode
+// 3) password for settings
 
 var config = {
   apiKey: "AIzaSyCuE1uw1toQDhgR0ccvV6QFBpm-1HwFYqM",
@@ -746,6 +748,13 @@ function clickOnSettingsButton(){
 }
 
 function revealOnlySelfCheckIn(){
+	//navbar
+	hideSectionByClass("uploadCSVNavItem");
+	hideSectionByClass("masterSheetNavItem");
+	hideSectionByClass("exportCSVNavItem");
+
+
+	// sections
 	hideSectionByClass("checkInMonitor");
 	hideSectionByClass("instructionsSection");
 	hideSectionByClass("schoolNameSection");
@@ -755,6 +764,11 @@ function revealOnlySelfCheckIn(){
 }
 
 function revealOnlyMasterCheckIn(){
+	//navbar
+	revealSectionByClass("uploadCSVNavItem");
+	revealSectionByClass("masterSheetNavItem");
+	revealSectionByClass("exportCSVNavItem");
+
 	revealSectionByClass("checkInMonitor");
 	revealSectionByClass("instructionsSection");
 	revealSectionByClass("schoolNameSection");

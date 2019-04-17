@@ -3,6 +3,12 @@
 	--progressBarWidth:0%;
 	--customNavBarColor :darkred;
 
+  /*NavBar Items*/
+  --uploadCSVNavItemDisplay:none;
+  --masterSheetNavItemDisplay:none;
+  --exportCSVNavItemDisplay:none;
+
+
 	/* Nomenclature is className+"display"*/
 	--checkInMonitorDisplay:none;
 	--instructionsSectionDisplay:none;
@@ -14,11 +20,20 @@
 }
 
 .navbar{
-/*	font-family: Helvetica;
-*/	border-radius: 10px;
+  border-radius: 10px;
 	color: white;
 	background-color: var(--customNavBarColor);
 
+}
+
+.uploadCSVNavItem{
+  display: var(--uploadCSVNavItemDisplay);
+}
+.masterSheetNavItem{
+  display: var(--masterSheetNavItemDisplay);
+}
+.exportCSVNavItem{
+  display: var(--exportCSVNavItemDisplay);
 }
 
 .progress{
@@ -158,6 +173,11 @@
 .selfCheckInNameInput{
   height:100px;
   font-size: 36px;
+}
+
+#checkInButton{
+	height: 40px;
+    font-size: 20px;
 }
 
 /* Modal CSS */

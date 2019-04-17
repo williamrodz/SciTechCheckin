@@ -27,18 +27,18 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
       <a class="navbar-brand" href="#">MITMUNC Check-In</a>
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" onclick= "toggleHideHTMLElement('uploadCSVDiv')" href="#">Upload CSV</a>
+        <li class="nav-item uploadCSVNavItem">
+          <a class="nav-link " onclick= "toggleHideHTMLElement('uploadCSVDiv')" href="#">Upload CSV</a>
         </li>
 
-        <li class="nav-item">
+        <li class="nav-item masterSheetNavItem">
           <a class="nav-link" title="Use if app not working" target="_blank" href="https://docs.google.com/spreadsheets/d/1G2CNtb4VXNooC-8G1G-oTF_C4VJDEbkIrq0EMysHr9E/edit?usp=sharing">Master Assignments Sheet</a>
         </li>        
 <!--         Update href link above with current year's assignment sheet.-->
-        <li class="nav-item">
+        <li class="nav-item exportCSVNavItem">
           <a class="nav-link" onclick= "exportCSV()" href="#">Export CSV</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item settingsNavItem">
           <a class="nav-link" onclick="clickOnSettingsButton()"href="#">Settings</a>
         </li>        
         </ul>
