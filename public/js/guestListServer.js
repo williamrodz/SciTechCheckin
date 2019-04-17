@@ -281,12 +281,37 @@ function getCurrentGuestDictsFromFirebase(){
 	});
 }
 
+function syncSettings(){
+	// go through db
+	db.collection("settings").get().then(function(querySnapshot) {
+	    querySnapshot.forEach(function(doc) {
+	        // doc.data() is never undefined for query doc snapshots
+	        var typeOfSettings = doc.id; //e.g customSettings
+	        var settingsDictionary = doc.data();
+	        var cloudCheckinMode = settingsDictionary["checkInMode"];
+	        var cloudConferenceName = settingsDictionary["conferenceName"];
+	       	var cloudNavBarColor = settingsDictionary["navBarColor"];
+
+	       	checkInMode = cloudCheckinMode;
+	       	setNavBarColor(cloudNavBarColor);
+	    });
+	}).then( function (something){
+		hideSectionByClass("settingsSection");
+
+		if (checkInMode == "SELFCHECKIN"){
+			revealOnlySelfCheckIn();
+		} else{
+			revealOnlyMasterCheckIn();
+		}			
+	});	
+}
+
 // Sync guestStates from firebase database
 function syncFromFirebase(){
 
 // Get realtime updates with Cloud Firestore
 // You can listen to a document with the onSnapshot() method. An initial call using the callback you provide creates a document snapshot immediately with the current contents of the single document. Then, each time the contents change, another call updates the document snapshot.
-	
+	syncSettings();
 	// go through db
 	db.collection("students").get().then(function(querySnapshot) {
 	    querySnapshot.forEach(function(doc) {
@@ -374,15 +399,9 @@ function UploadCSV() {
 
 
 window.addEventListener('DOMContentLoaded', function(){
-	hideSectionByClass("settingsSection");
-
-	if (checkInMode == "SELFCHECKIN"){
-		revealOnlySelfCheckIn();
-	} else{
-		revealOnlyMasterCheckIn();
-	}
 	loadAttendeeDataIntoGlobalArray();
 	syncFromFirebase();
+
 	document.getElementById('memberNameInput').addEventListener("keyup",
 		function (event){
 
@@ -788,14 +807,46 @@ function escapeSettings(){
 }
 
 
-function setNavBarColor(){
-	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
+function setNavBarColor(color=null){
+	if (color == null){
+		var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
+	} else{
+		var rawNavBarColorInput = color;
+	}
+
 	let root = document.documentElement;
 	root.style.setProperty('--customNavBarColor', rawNavBarColorInput);
 
 }
 
 function saveSettingsButton(){
-	setNavBarColor();
+
+	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
+	setNavBarColor(rawNavBarColorInput);
+
+
+	var checkInModeDropDown = document.getElementById("checkInModeDropdown");
+	var selectedCheckInMode = checkInModeDropDown.options[checkInModeDropDown.selectedIndex].value;
+	// if (selectedValue == "Self Check-In"){
+	// 	checkInModeToUpload = "SELFCHECKIN";
+	// 	console.log("Changed to self check in");
+	// } else {
+	// 	checkInModeToUpload = "MASTER";
+	// 	console.log("changed to master");
+	// }
+	checkInMode = selectedCheckInMode;
+
+	// persist to Firebase
+	db.collection("settings").doc("customSettings").update({
+	    'checkInMode':selectedCheckInMode,
+	    'navBarColor':rawNavBarColorInput
+	        })
+		.then(function() {
+			console.log("synced settings")
+		})
+		.catch(function(error) {
+		    console.error("Error updating settings", error);
+		});		
+
 	escapeSettings();
 }
