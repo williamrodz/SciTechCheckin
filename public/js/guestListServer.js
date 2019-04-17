@@ -413,10 +413,13 @@ window.addEventListener('DOMContentLoaded', function(){
 
 function enableCheckInButton(){
 	document.getElementById("checkInButton").disabled = false;
+	document.getElementById("checkInButton").setAttribute("class","btn btn-success");
+
 }
 
 function disableCheckInButton(){
 	document.getElementById("checkInButton").disabled = true;
+	document.getElementById("checkInButton").setAttribute("class","btn btn-default");
 
 }
 
