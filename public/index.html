@@ -110,7 +110,11 @@
   </div>
 
   <div class="selfCheckInSection">
+    <BR/>
+    <BR/>
+
     <h2>Welcome to the conference!</h2>
+    <BR/>
       <form>
        <div class="form-group guestNameInput">
          <datalist id="attendeeList">
@@ -120,6 +124,37 @@
      </form>  
     <button id="checkInButton" type="button" onclick="clickCheckInButton()" disabled="true">Check In</button>
   </div>
+
+  <!-- Optional Modal Button HTML -->
+
+<!--   <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#success_tic">Open Modal</button> -->
+
+  <!-- Actual Modal with ID:success_tic -->
+  <div id="success_tic" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <a class="close" href="#" data-dismiss="modal">&times;</a>
+        <div class="page-body">
+          <div class="head">  
+            <h3 style="margin-top:5px;">Check-in confirmed!</h3>
+          </div>
+
+          <h1 style="text-align:center;"><div class="checkmark-circle">
+            <div class="background"></div>
+            <div class="checkmark draw"></div>
+          </div><h1>
+          <h4>Enjoy the conference!</h4>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
   <div class="settingsSection">
       <h2>Settings</h2>
       <ul>
@@ -131,7 +166,7 @@
           </select>
         </li>        
       </ul>
-      <button type="button" onclick="saveSettingsButton()">Save Settings</button>
+      <button type="button" class="btn btn-success" onclick="saveSettingsButton()">Save Settings</button>
   </div>  
 
    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

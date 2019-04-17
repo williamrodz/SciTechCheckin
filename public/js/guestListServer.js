@@ -31,7 +31,7 @@ var guestStates = {};
 var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
-var checkInMode = "SELFCHECKIN";
+var checkInMode = "SELFCHECKIN"; //"SELFCHECKIN" or "MASTER"
 
 
 // Takes any html element ID and add the hidden CSS class
@@ -372,10 +372,12 @@ function UploadCSV() {
 
 
 window.addEventListener('DOMContentLoaded', function(){
+	hideSectionByClass("settingsSection");
 
-	hideSettingsSection();
 	if (checkInMode == "SELFCHECKIN"){
-		hid
+		revealOnlySelfCheckIn();
+	} else{
+		revealOnlyMasterCheckIn();
 	}
 	loadAttendeeDataIntoGlobalArray();
 	syncFromFirebase();
@@ -387,6 +389,8 @@ window.addEventListener('DOMContentLoaded', function(){
 			if (Object.keys(guestsBySchool).includes(currentMemberInput)){
 				clearGuestList();
 				createTable(currentMemberInput);
+			} else{
+				clearGuestList();
 			}
 			hideSettingsSection();
 		});
@@ -402,7 +406,6 @@ window.addEventListener('DOMContentLoaded', function(){
 			} else{
 				disableCheckInButton();
 			}
-			hideSettingsSection();
 
 		});	
 });
@@ -431,6 +434,7 @@ function clickCheckInButton(){
 	}	
 	if (guestHash != ""){
 		checkInGuest(guestHash);
+		$('#success_tic').modal('show');
 	} 
 }
 
@@ -738,22 +742,29 @@ function clickOnSettingsButton(){
 
 }
 
+function revealOnlySelfCheckIn(){
+	hideSectionByClass("checkInMonitor");
+	hideSectionByClass("instructionsSection");
+	hideSectionByClass("schoolNameSection");
+	hideSectionByClass("attendeesSection");
+	revealSectionByClass("selfCheckInSection");	
+
+}
+
+function revealOnlyMasterCheckIn(){
+	revealSectionByClass("checkInMonitor");
+	revealSectionByClass("instructionsSection");
+	revealSectionByClass("schoolNameSection");
+	revealSectionByClass("attendeesSection");
+	hideSectionByClass("selfCheckInSection");	
+
+}
+
 function escapeSettings(){
 	if (checkInMode != "SELFCHECKIN"){
-		revealSectionByClass("checkInMonitor");
-		revealSectionByClass("instructionsSection");
-		revealSectionByClass("schoolNameSection");
-		revealSectionByClass("attendeesSection");
-		hideSectionByClass("selfCheckInSection");
-
-
+		revealOnlyMasterCheckIn();
 	} else{
-		hideSectionByClass("checkInMonitor");
-		hideSectionByClass("instructionsSection");
-		hideSectionByClass("schoolNameSection");
-		hideSectionByClass("attendeesSection");
-		revealSectionByClass("selfCheckInSection");
-
+		revealOnlySelfCheckIn();
 	}
 	hideSectionByClass("settingsSection");
 
