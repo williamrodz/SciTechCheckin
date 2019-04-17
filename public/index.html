@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title>MITMUNC Check-In</title>
+  <title>{{conferenceName}} Check-In</title>
 
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -15,6 +15,7 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.7.3/firebase.js"></script>
   <script src="js/guestListServer.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
   <link rel="icon" href="http://www.mitmunc.org/assets/mitmunc_logo_circular-8b1918716af1cc2925525ea7e2a2b3dd5a99cee760fbe46cb95f6c0d7b7e62db.png">
 
   </head>
@@ -25,7 +26,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-      <a class="navbar-brand" href="#">MITMUNC Check-In</a>
+      <a class="navbar-brand" href="#">{{conferenceName}} Check-In</a>
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item uploadCSVNavItem">
           <a class="nav-link " onclick= "toggleHideHTMLElement('uploadCSVDiv')" href="#">Upload CSV</a>
@@ -113,7 +114,7 @@
     <BR/>
     <BR/>
 
-    <h2>Welcome to the conference!</h2>
+    <h2>Welcome to {{conferenceName}}!</h2>
     <BR/>
       <form>
        <div class="form-group guestNameInput">
@@ -158,6 +159,7 @@
   <div class="settingsSection">
       <h2>Settings</h2>
       <ul>
+        <li>Conference Name<input id="conferenceNameInput" ng-model="conferenceName"type="text" name="conferenceName" value="MITMUNC"><br> </li>        
         <li>Navbar Color<input id="navBarColorInput" type="text" name="navBarColor" value="#8B0000"><br> </li>
         <li>Check-in Mode
           <select id="checkInModeDropdown"name="Mode">

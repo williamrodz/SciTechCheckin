@@ -871,6 +871,8 @@ function setNavBarColor(color=null){
 
 function saveSettingsButton(){
 
+	var conferenceNameInput = document.getElementById("conferenceNameInput").value;
+
 	var rawNavBarColorInput = document.getElementById("navBarColorInput").value;
 	setNavBarColor(rawNavBarColorInput);
 
