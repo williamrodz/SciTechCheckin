@@ -16,11 +16,11 @@
 
 var config = {
   apiKey: "AIzaSyCuE1uw1toQDhgR0ccvV6QFBpm-1HwFYqM",
-  authDomain: "mitmunc-checkin.firebaseapp.com",
-  databaseURL: "https://mitmunc-checkin.firebaseio.com",
-  projectId: "mitmunc-checkin",
-  storageBucket: "mitmunc-checkin.appspot.com",
-  messagingSenderId: "355923752781"
+  authDomain: "scitechcheckin.firebaseapp.com",
+  databaseURL: "https://scitechcheckin.firebaseio.com",
+  projectId: "scitechcheckin",
+  storageBucket: "scitechcheckin.appspot.com",
+  messagingSenderId: "880455289287"
 };
 firebase.initializeApp(config);
 const db = firebase.firestore();
