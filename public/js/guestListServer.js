@@ -180,7 +180,7 @@ function createDictionaryHash(dictionary){
 		// add each letter of attribute
 		for (var j=0; j < attribute.length; j++){
 			let letter = attribute[j];
-			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter.toLowerCase()) != -1){
+			if ("abcdefghijklmnopqrstuvwxyz-.é+".indexOf(letter.toLowerCase()) != -1){
 				dictionaryHash = dictionaryHash + letter;
 			}
 		}
@@ -189,7 +189,7 @@ function createDictionaryHash(dictionary){
 		var value = dictionary[attribute]; 
 		for (var j=0; j < value.length; j++){
 			let letter = value[j];
-			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter.toLowerCase()) != -1){
+			if ("abcdefghijklmnopqrstuvwxyz-.+é".indexOf(letter.toLowerCase()) != -1){
 				dictionaryHash = dictionaryHash + letter;
 			}
 		}
