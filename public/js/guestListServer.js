@@ -34,6 +34,7 @@ var defaultInitialGuestCount = 0;
 
 var currentGuestCount = defaultInitialGuestCount;
 var checkInMode = "SELFCHECKIN"; //"SELFCHECKIN" or "MASTER"
+var localConferenceName = "";
 var additionalAttributes = []; //attributes other than School or Name 
 
 
@@ -77,6 +78,21 @@ function loadAttendeeToAutocomplete(attendeeDictionary){
 	optionHTML.setAttribute("value",attendeeDictionary["Name"]);
 	optionHTML.setAttribute("hash",createDictionaryHash(attendeeDictionary));
 	dataList.appendChild(optionHTML);		
+
+}
+
+function updateAffiliationOfGuest(guestHash, newValue){
+// persist to Firebase
+	db.collection("students").doc(guestHash).update({
+	    "School":newValue
+	        })
+		.then(function() {
+		    console.log("Updated affiliation");		    
+		})
+		.catch(function(error) {
+		    console.error("Error checking in guest on FB: ", error);
+		});		
+
 
 }
 
@@ -163,6 +179,9 @@ function toggleGuestCheckIn(guestHash){
 	}
 }
 
+function generateRandomString(){
+	return String(Math.random()).substring(2);
+}
 
 // Creates hash to be used for database and ID in HTML row for a particular guest
 function createDictionaryHash(dictionary){
@@ -176,6 +195,9 @@ function createDictionaryHash(dictionary){
 		if (attribute == "checkInStatus"){
 			continue;
 		}
+		if (attribute.indexOf("School") != -1){
+			continue;
+		}			
 
 		// add each letter of attribute
 		for (var j=0; j < attribute.length; j++){
@@ -196,11 +218,12 @@ function createDictionaryHash(dictionary){
 		dictionaryHash = dictionaryHash + "}"; 
 
 	}
+	dictionaryHash = dictionaryHash;
 
 	return dictionaryHash;
 
 	// --- old method ---
-	//dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
+	//dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary["School"]+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
 
 }
 
@@ -226,7 +249,10 @@ function uploadDataToFirebase(guestDict) {
 
   	var attributes = Object.keys(guestDict);
 
-  	let values = Object.values(guestDict);
+  	var values = Object.values(guestDict);
+  	if (values[1] == ""){
+  		values[1] = "NOAFFILIATION";
+  	}
 
   	console.log("GUEST HASH IS :",guestHash);
 
@@ -294,24 +320,6 @@ function getGlobalAttendeesNames(){
 }
 
 
-// Careful! Exhausts Firebase daily queries limit in less than three minutes
-// Was an attempt to keep guest check in status synced between two simultaneous sessions 
-// Does not work 
-function watchGuest(guestHash){
-	var checkInstatusRef = db.ref('students/'+guestHash+'/checkInStatus');
-
-
-	checkInstatusRef.on('value', function(snapshot) {
-	 	//updateStarCount(postElement, snapshot.val());
-	 	console.log(snapshot.val());
-		var checkInStatus = doc.data()['checkInStatus'];
-		if (checkInStatus){
-			checkInGuest(guestHash);
-		} else{
-			checkOutGuest(guestHash);
-		}	  
-	});	
-}
 
 // For debugging purposes
 function getCurrentGuestDictsFromFirebase(){
@@ -322,7 +330,7 @@ function getCurrentGuestDictsFromFirebase(){
 	        var guestHash = doc.id;
 	        var guestDict = doc.data();
 	        var checkInStatus = guestDict['checkInStatus'];
-	        var school = guestDict['School'];
+	        var school = guestDict["School"];
 	        //console.log('pushing');
 	        students.push(guestDict);
 	    });
@@ -341,7 +349,11 @@ function syncSettings(){
 	        var cloudConferenceName = settingsDictionary["conferenceName"];
 	       	var cloudNavBarColor = settingsDictionary["navBarColor"];
 
+
 	       	checkInMode = cloudCheckinMode;
+	       	localConferenceName = cloudConferenceName;
+			//document.getElementById("welcomeMessage").innerHTML = "Welcome to "+localConferenceName+"!";
+
 	       	setNavBarColor(cloudNavBarColor);
 	    });
 	}).then( function (something){
@@ -369,7 +381,7 @@ function syncFromFirebase(){
 	        var guestHash = doc.id;
 	        var guestDict = doc.data();
 	        var checkInStatus = guestDict['checkInStatus'];
-	        var school = guestDict['School'];
+	        var school = guestDict["School"];
 
 	        //verify additional attributes
 	        if (gotAdditionalAttributes == false){
@@ -402,7 +414,6 @@ function syncFromFirebase(){
 // Processes a CSV row of guests and uploads to FB database
 // Ensure that row's columns match with data values
 function processCSVDataRow(row,firstRowAttributes){
-	//attributes = ['Name','School','Committee','Delegation'];
 
 	// ----old method---
 	// var school = row[0]
@@ -410,7 +421,6 @@ function processCSVDataRow(row,firstRowAttributes){
 	// var delegation = row[2]	
 	// var name = row[3]
 
-	// var newGuestDict = {'Name':name,"School":school,'Committee':committee, 'Delegation':delegation, 'checkInStatus':false};
 
 	// var school = "default";
 	// ----new method----
@@ -419,13 +429,12 @@ function processCSVDataRow(row,firstRowAttributes){
 		var attribute = firstRowAttributes[i];
 		console.log("Processing attribute",attribute);
 		newGuestDict[attribute] = row[i];
-		if (attribute === 'School'){
+		if (attribute === "School"){
 			var school = row[i];
 		}
 	}
 	console.log("processCSVDataRow");
 	console.log("newGuestDict:",newGuestDict);
-	//console.log("newGuestDict[School]:",newGuestDict['"School"']);
 
 
 	uploadDataToFirebase(newGuestDict);
@@ -539,8 +548,13 @@ function clickCheckInButton(){
 			guestHash = currentOption.getAttribute("hash");
 			break;
 		}
-	}	
+	}
 	if (guestHash != ""){
+
+		let affiliation = prompt('What is your affiliation? (e.g. Innovator, MIT Student, Guest Speaker)');
+		// let bar = confirm('Confirm or deny');
+		updateAffiliationOfGuest(guestHash,affiliation);
+
 		checkInGuest(guestHash);
 		$('#success_tic').modal('show');
 	} 
@@ -554,7 +568,7 @@ function exportCSV(){
 
 // Returns a row array of all attendees
 function getArrayOfRowData(){	
-	var columns = ['School','Committee','Delegation','checkInStatus'];
+	var columns = ["School",'Committee','Delegation','checkInStatus'];
 
 	var outputRows = [];
 	outputRows.push(columns);
@@ -728,7 +742,7 @@ function createTable(targetSchool){
 
 	var firstRow = document.createElement('div');
 	firstRow.setAttribute("class","gridRow");
-	var attributes = ['SelectAll','#','Name','School'];//'Committee','Delegation'];
+	var attributes = ['SelectAll','#','Name',"School"];//'Committee','Delegation'];
 	for (var i=0; i < additionalAttributes.length; i++){
 		additionalAttribute = additionalAttributes[i];
 		attributes.push(additionalAttribute);
@@ -761,7 +775,7 @@ function createTable(targetSchool){
 	        var guestHash = doc.id;
 	        var guestDict = doc.data();
 	        var checkInStatus = guestDict['checkInStatus'];
-	        var school = guestDict['School'];
+	        var school = guestDict["School"];
 	        // do logic
 
 			var gridRow = document.createElement('div');
@@ -770,7 +784,7 @@ function createTable(targetSchool){
 
 
 			// sync with other open browsers with same school
-			//watchGuest(guestHash); <-- TBD
+			//TBD
 
 			// if row already exists or not target school, don't add
 			if (targetSchool != school || document.getElementById('row:'+guestHash)){
@@ -804,7 +818,7 @@ function createTable(targetSchool){
 			indexNumber++;
 
 			//Add content cells
-			var cellAttributes = ['CheckInStatus','Name','School'];//,'Committee','Delegation'];
+			var cellAttributes = ['CheckInStatus','Name',"School"];//,'Committee','Delegation'];
 			//additional attributes
 			for (var i=0; i < additionalAttributes.length; i++){
 				additionalAttribute = additionalAttributes[i];
@@ -930,7 +944,8 @@ function saveSettingsButton(){
 	// persist to Firebase
 	db.collection("settings").doc("customSettings").update({
 	    'checkInMode':selectedCheckInMode,
-	    'navBarColor':rawNavBarColorInput
+	    'navBarColor':rawNavBarColorInput,
+	    'conferenceName':conferenceNameInput
 	        })
 		.then(function() {
 			console.log("synced settings")
