@@ -180,7 +180,7 @@ function createDictionaryHash(dictionary){
 		// add each letter of attribute
 		for (var j=0; j < attribute.length; j++){
 			let letter = attribute[j];
-			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter) != -1){
+			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter.toLowerCase()) != -1){
 				dictionaryHash = dictionaryHash + letter;
 			}
 		}
@@ -189,7 +189,7 @@ function createDictionaryHash(dictionary){
 		var value = dictionary[attribute]; 
 		for (var j=0; j < value.length; j++){
 			let letter = value[j];
-			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter) != -1){
+			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter.toLowerCase()) != -1){
 				dictionaryHash = dictionaryHash + letter;
 			}
 		}
@@ -230,7 +230,7 @@ function uploadDataToFirebase(guestDict) {
 
   	console.log("GUEST HASH IS :",guestHash);
 
-  	guestHash = guestHash.replace(/"/g,"");
+  	//guestHash = guestHash.replace(/"/g,"");
   	var guestHashRef = db.collection("students").doc(guestHash);
 
 	guestHashRef.set({
@@ -418,7 +418,7 @@ function processCSVDataRow(row,firstRowAttributes){
 	for (var i = 0; i < firstRowAttributes.length; i++){
 		var attribute = firstRowAttributes[i];
 		console.log("Processing attribute",attribute);
-		newGuestDict[attribute.replace(/"/g,"")] = row[i];
+		newGuestDict[attribute] = row[i];
 		if (attribute === 'School'){
 			var school = row[i];
 		}
