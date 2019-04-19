@@ -82,7 +82,11 @@ function loadAttendeeToAutocomplete(attendeeDictionary){
 
 // Record in local guestStates dictionary and then change CSS if active
 function checkInGuest(guestHash){
-	console.log('went in ');
+	console.log("-------------")
+	console.log("Attempting to check in guestHash:");
+	console.log(guestHash);
+	console.log("-------------")
+
 	// persist to Firebase
 	db.collection("students").doc(guestHash).update({
 	    'checkInStatus':true
@@ -165,16 +169,38 @@ function createDictionaryHash(dictionary){
 	// -- new method --
 	var attributes = Object.keys(dictionary);
 	attributes.sort();
-	dictionaryHash = "";
+	var dictionaryHash = "";
 
 	for (var i=0; i <attributes.length; i++){
 		var attribute = attributes[i];
-		dictionaryHash += attribute + "{"+dictionary[attribute]+"}";
+		if (attribute == "checkInStatus"){
+			continue;
+		}
+
+		// add each letter of attribute
+		for (var j=0; j < attribute.length; j++){
+			let letter = attribute[j];
+			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter) != -1){
+				dictionaryHash = dictionaryHash + letter;
+			}
+		}
+
+		dictionaryHash = dictionaryHash + "{"; 
+		var value = dictionary[attribute]; 
+		for (var j=0; j < value.length; j++){
+			let letter = value[j];
+			if ("abcdefghijklmnopqrstuvwxyz".indexOf(letter) != -1){
+				dictionaryHash = dictionaryHash + letter;
+			}
+		}
+		dictionaryHash = dictionaryHash + "}"; 
+
 	}
+
+	return dictionaryHash;
 
 	// --- old method ---
 	//dictionaryHash = 'Name{'+dictionary['Name']+'}School{'+dictionary['School']+'}Delegation{'+dictionary['Delegation']+'}Committee{'+dictionary['Committee']+'}checkInStatus{'+dictionary['Name']+'}';
-	return dictionaryHash;
 
 }
 
@@ -196,22 +222,29 @@ function createGuestDataStructure(guestsDict){
 
 // Upload a single guest to the Firebase database from its guest dictionary
 function uploadDataToFirebase(guestDict) {
-  	var guestHash = createDictionaryHash(guestDict);
+  	let guestHash = createDictionaryHash(guestDict);
 
   	var attributes = Object.keys(guestDict);
-  	for (var i=0; i <attributes.length; i++){
-  		attribute = attributes[i];
 
-		db.collection("students").doc(guestHash).set({
-		    attribute: guestDict[attribute],
-		        })
-			.then(function() {
-			    console.log("Document successfully written!");
-			})
-			.catch(function(error) {
-			    console.error("Error writing document: ", error);
-			});  		
-  	}
+  	let values = Object.values(guestDict);
+
+  	console.log("GUEST HASH IS :",guestHash);
+
+  	guestHash = guestHash.replace(/"/g,"");
+  	var guestHashRef = db.collection("students").doc(guestHash);
+
+	guestHashRef.set({
+	    "Name": values[0],
+	    "School":values[1],
+	    "checkInStatus":false
+	        })
+		.then(function() {
+		    console.log("Document successfully written!");
+		})
+		.catch(function(error) {
+		    console.error("Error writing document: ", error);
+		});  		
+  	// }
 
 
 
@@ -237,11 +270,13 @@ function loadAttendeeDataIntoGlobalArray(){
 	    querySnapshot.forEach(function(doc) {
 	        // doc.data() is never undefined for query doc snapshots
 	        //console.log(doc.id, " => ", doc.data());
-	        localAttendeeData = doc.data();
+	        var localAttendeeData = doc.data();
 	        attendees.push(localAttendeeData);
 	        globalAttendees.push(localAttendeeData);
 	        attendeesSoFar += 1;
+
 	        console.log("Processed",localAttendeeData);
+	        console.log("Doc id is",doc.id);
 	    });
 	}).then( function(attendees){
 		for (i = 0; i < globalAttendees.length; i++) { 
@@ -338,7 +373,7 @@ function syncFromFirebase(){
 
 	        //verify additional attributes
 	        if (gotAdditionalAttributes == false){
-		        guestDictAttributes = Object.keys(guestDict);
+		        var guestDictAttributes = Object.keys(guestDict);
 		        for (var i=0 ; i <guestDictAttributes.length; i++){
 		        	localAttribute = guestDictAttributes[i];
 		        	if (localAttribute != "School" && localAttribute != "checkInStatus" 
@@ -348,7 +383,6 @@ function syncFromFirebase(){
 		        }
 		        gotAdditionalAttributes = true	        	
 	        }
-
 
 	        guestStates[guestHash] = checkInStatus;
 
@@ -378,12 +412,22 @@ function processCSVDataRow(row,firstRowAttributes){
 
 	// var newGuestDict = {'Name':name,"School":school,'Committee':committee, 'Delegation':delegation, 'checkInStatus':false};
 
+	// var school = "default";
 	// ----new method----
 	var newGuestDict = {};
-	for (var i=0; i < firstRowAttributes.length; i++){
-		attribute = firstRowAttributes[i];
-		newGuestDict[attribute] = row[i];
+	for (var i = 0; i < firstRowAttributes.length; i++){
+		var attribute = firstRowAttributes[i];
+		console.log("Processing attribute",attribute);
+		newGuestDict[attribute.replace(/"/g,"")] = row[i];
+		if (attribute === 'School'){
+			var school = row[i];
+		}
 	}
+	console.log("processCSVDataRow");
+	console.log("newGuestDict:",newGuestDict);
+	//console.log("newGuestDict[School]:",newGuestDict['"School"']);
+
+
 	uploadDataToFirebase(newGuestDict);
 
 	if (guestsBySchool[school]){
@@ -416,7 +460,7 @@ function UploadCSV() {
               firstRow = rows[0];
               firstRowAttributes = firstRow.split(",");
 
-              for (var i = 0; i < rows.length; i++) {
+              for (var i = 1; i < rows.length; i++) {
                   var row = table.insertRow(-1);
                   var cells = rows[i].split(",");
                   processCSVDataRow(cells,firstRowAttributes);
@@ -460,7 +504,6 @@ window.addEventListener('DOMContentLoaded', function(){
 	document.getElementById('selfCheckInNameInput').addEventListener("keyup",
 		function (event){
 			var currentAttendeeInput = document.getElementById("selfCheckInNameInput").value;
-			console.log("pressed");
 			if (getGlobalAttendeesNames().includes(currentAttendeeInput)){
 				//enable Check-In Button
 				enableCheckInButton();
