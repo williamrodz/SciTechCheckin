@@ -50,6 +50,11 @@
 	font-family: garamond;
 	margin:10px;
 }
+.bannerSection{
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+}
 
 .checkInMonitor{
 	display: var(--checkInMonitorDisplay);
